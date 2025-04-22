@@ -67,7 +67,7 @@ const ProductCard: React.FC<{ product: Product, index: number }> = ({ product, i
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">{product?.name}</h3>
                 <div className="flex items-center mb-2">
                     <div className="flex mr-1">{renderStars(product?.rating)}</div>
-                    <span className="text-sm text-gray-600">({product?.rating.toFixed(1)})</span>
+                    <span className="text-sm text-gray-600">({product?.rating})</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-3 flex-grow line-clamp-2">{product?.description}</p>
                 <div className="flex items-end justify-between mt-auto">

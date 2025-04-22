@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { BellIcon, Search, Menu, Settings, ChevronDown } from 'lucide-react';
 import Button from '../ui/Button';
-import { currentUser } from '../../../public/data';
+import { useAppDispatch } from '../../Redux/hooks';
+import { logout } from '../../Redux/features/auth/authSlice';
+// import { currentUser } from '../../../public/data';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="bg-white shadow-sm z-10">
@@ -63,11 +66,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   <div className="flex items-center">
                     <img
                       className="h-8 w-8 rounded-full"
-                      src={currentUser.avatar}
-                      alt={currentUser.name}
+                      alt='nai'
+                      // src={currentUser.avatar}
+                      // alt={currentUser.name}
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 hidden md:block">
-                      {currentUser.name}
+                      {/* {currentUser.name} */}name
                     </span>
                     <ChevronDown size={16} className="ml-1 text-gray-400 hidden md:block" />
                   </div>
@@ -79,7 +83,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Your Profile</a>
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Settings</a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
+                    <a onClick={() => dispatch(logout())} href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
                   </div>
                 </div>
               )}

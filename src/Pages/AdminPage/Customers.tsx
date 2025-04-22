@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { FiSearch, FiPlus, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGetAllAdminsQuery, useGetAllUsersQuery } from "../../Redux/features/auth/authApi";
 
 const Customers = () => {
+  // const {data : users} = useGetAllUsersQuery(undefined);
+  // console.log(users);
+  const {data : admins} = useGetAllAdminsQuery(undefined);
+  console.log(admins);
+  
+  // dummy data
   const [customers, setCustomers] = useState([
     {
       id: 1,
@@ -295,9 +302,9 @@ const Customers = () => {
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
                 <AnimatePresence>
-                  {currentCustomers.map((customer) => (
+                  {currentCustomers?.map((customer,index) => (
                     <motion.tr
-                      key={customer.id}
+                      key={index}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}

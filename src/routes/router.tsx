@@ -8,6 +8,10 @@ import Products from "../Pages/Products/Products";
 import Dashboard from "../components/layout/Dashboard";
 import AdminHome from "../Pages/AdminPage/AdminHome";
 import Customers from "../Pages/AdminPage/Customers";
+import PrivateRoute from "../utils/PrivateRoute";
+import Profile from "../Pages/Profile/Profile";
+import DynamicCategory from "../utils/DynamicCategory";
+import Cart from "../Pages/Cart/Cart";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -29,20 +33,33 @@ export const router = createBrowserRouter([
       {
         path: "/products",
         element: <Products />,
+        
+      },
+      {
+        path: "/profile",
+        element: <PrivateRoute><Profile /></PrivateRoute>,
+      },
+      {
+        path: "/category/:category",
+        element: <DynamicCategory />,
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
       },
     ],
   },
   {
     path: "/dashboard",
     element: (
-     
+      <PrivateRoute>
         <Dashboard/>
-     
+      </PrivateRoute>
     ),
     children: [
       {
         path:"/dashboard/admin-home",
-        element:<AdminHome/>
+        element:<PrivateRoute><AdminHome/></PrivateRoute>
       },
       {
         path: "/dashboard/products",
@@ -50,7 +67,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dashboard/customers",
-        element: <Customers/>
+        element: <PrivateRoute><Customers/></PrivateRoute>
       },
       // {
       //   path: "/dashboard/payment",

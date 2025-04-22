@@ -12,8 +12,6 @@ const Header = () => {
 
 
   const user = useAppSelector((state) => state.auth.user);
-  console.log(user?.role);
-
 
   const dispatch = useAppDispatch();
 
@@ -62,11 +60,11 @@ const Header = () => {
             </a>
             <div>
 
-              <Link to='/profile' className="text-gray-600 hover:text-gray-900">
+             {!user? "" : <Link to='/profile' className="text-gray-600 hover:text-gray-900">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-              </Link>
+              </Link>}
 
             </div>
             {user?.role === 'admin' && <div className='relative group'>
@@ -80,9 +78,23 @@ const Header = () => {
             </div>}
 
             {user ? (
-              <Link to="/login" onClick={() => dispatch(logout())} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Logout</Link>
+              <>
+                <Link to="/login" onClick={() => dispatch(logout())} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Logout</Link>
+                
+              </>
             ) : (
-              <Link to="/login" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Login</Link>
+              <>
+                <Link to="/login" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Login</Link>
+
+              </>
+            )}
+            {user?.role === "user" ? (
+              <Link to="/orders" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">my order</Link>
+            ) : (
+              <>
+               
+
+              </>
             )}
 
 
