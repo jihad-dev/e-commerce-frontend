@@ -1,8 +1,6 @@
 import { BaseQueryApi, BaseQueryFn, createApi, DefinitionType, FetchArgs, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { toast } from "sonner";
-// Remove unused import
-// import { useAppSelector } from "../hooks";
 import { logout, setUser } from "../features/auth/authSlice";
 import { RootState } from "../store"; // Assuming your RootState is exported from here
 

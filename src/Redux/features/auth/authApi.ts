@@ -13,6 +13,7 @@ const authApi = baseApi.injectEndpoints({
             query: () => ({
                 url: '/users/all-user',
                 method: 'GET',
+                transformResponse: (response: any) => response?.data,
             }),
         }),
         getAllAdmins: builder.query({

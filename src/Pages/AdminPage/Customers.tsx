@@ -2,123 +2,23 @@ import { useState } from "react";
 import { FiSearch, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetAllUsersQuery, } from "../../Redux/features/auth/authApi";
+import Loader from "../../utils/Loader";
+import { Link } from "react-router-dom";
 
 const Customers = () => {
-  const {data : users} = useGetAllUsersQuery(undefined);
-  console.log(users);
-
-  
-  // dummy data
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "John Doe", 
-      email: "john@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    {
-      id: 1,
-      name: "jihad", 
-      email: "jihad@example.com",
-      orders: 5,
-      totalSpent: 549.99,
-      lastOrder: "2024-01-15",
-      status: "active"
-    },
-    // More customer data would come from API
-  ]);
-
+ 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [filterStatus, setFilterStatus] = useState("all");
-  
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+ 
+  const {data : users,isLoading} = useGetAllUsersQuery(undefined);
+  console.log(users?.data);
+
+  if(isLoading){
+    return <Loader />
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -152,28 +52,30 @@ const Customers = () => {
   };
 
   // Filter and sort customers
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || customer.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  }).sort((a, b) => {
-    switch(sortBy) {
-      case 'orders':
-        return b.orders - a.orders;
-      case 'spent':
-        return b.totalSpent - a.totalSpent;
-      case 'recent':
-        return new Date(b.lastOrder).getTime() - new Date(a.lastOrder).getTime();
-      default:
-        return a.name.localeCompare(b.name);
-    }
-  });
+    const filteredCustomers = Array.isArray(users) 
+      ? users.filter((customer: any) => {
+        const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = filterStatus === 'all' || customer.status === filterStatus;
+        return matchesSearch && matchesStatus;
+      }).sort((a: any, b: any) => {
+        switch(sortBy) {
+          case 'orders':
+            return b.orders - a.orders;
+          case 'spent':
+            return b.totalSpent - a.totalSpent;
+          case 'recent':
+            return new Date(b.lastOrder).getTime() - new Date(a.lastOrder).getTime();
+          default:
+            return a.name.localeCompare(b.name);
+        }
+      })
+    : []; // Default to empty array if users is not an array
 
   // Get current customers for pagination
   const indexOfLastCustomer = currentPage * itemsPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - itemsPerPage;
-  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  // const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
 
   // Change page
@@ -218,10 +120,10 @@ const Customers = () => {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {[
-            { title: "Total Customers", value: "1,234", change: "↑ 12%", isPositive: true },
-            { title: "Active Customers", value: "987", change: "↑ 8%", isPositive: true },
-            { title: "Total Revenue", value: "$45,678", change: "↑ 15%", isPositive: true },
-            { title: "Avg. Order Value", value: "$123", change: "↓ 3%", isPositive: false }
+            { title: "Total Customers", value:users && users?.data?.length ? users?.data?.length : 0, change: "↑ 12%", isPositive: true },
+            { title: "Active Customers", value: Array.isArray(users) ? users?.data?.filter((user: {status: string}) => user.status === 'active').length : 0, change: "↑ 8%", isPositive: true },
+            { title: "Total Revenue", value: Array.isArray(users) ? `$${users?.data?.reduce((acc: number, user: {totalSpent?: number}) => acc + (user.totalSpent || 0), 0).toLocaleString()}` : '$0', change: "↑ 15%", isPositive: true },
+            { title: "Avg. Order Value", value: Array.isArray(users) && users.length > 0 ? `$${(users?.data?.reduce((acc: number, user: {totalSpent?: number}) => acc + (user.totalSpent || 0), 0) / users?.data?.length).toFixed(2)}` : '$0', change: "↓ 3%", isPositive: false }
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -301,7 +203,7 @@ const Customers = () => {
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
                 <AnimatePresence>
-                  {currentCustomers?.map((customer,index) => (
+                  {users?.data?.map((customer: any,index: any) => (
                     <motion.tr
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
@@ -316,46 +218,57 @@ const Customers = () => {
                             whileHover={{ scale: 1.1 }}
                             className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-200 to-purple-200 flex items-center justify-center shadow-inner"
                           >
-                            <span className="text-sm font-semibold text-blue-800">{customer.name.charAt(0)}</span>
+                            <span className="text-sm font-semibold text-blue-800">{customer?.name?.charAt(0)}</span>
                           </motion.div>
                           <div className="ml-4">
-                            <div className="text-sm font-semibold text-gray-900">{customer.name}</div>
-                            <div className="text-xs text-gray-500 md:hidden">{customer.email}</div>
+                            <div className="text-sm font-semibold text-gray-900">{customer?.name}</div>
+                            <div className="text-xs text-gray-500 md:hidden">{customer?.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                        <div className="text-sm text-gray-600">{customer.email}</div>
-                        <div className="text-xs text-gray-500">Last order: {customer.lastOrder}</div>
+                        <div className="text-sm text-gray-600">{customer?.email}</div>
+                        <div className="text-xs text-gray-500">Last order: {customer?.lastOrder}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                        <div className="text-sm text-gray-900">{customer.orders} orders</div>
-                        <div className="text-xs text-gray-500">${customer.totalSpent} spent</div>
+                        <div className="text-sm text-gray-900">{customer?.orders} orders</div>
+                        <div className="text-xs text-gray-500">${customer?.totalSpent} spent</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <motion.span 
                           whileHover={{ scale: 1.05 }}
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            customer.status === 'active'
+                            customer?.status === 'in-progress'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-red-100 text-red-800'
                           }`}
                         >
                           <span className={`w-1.5 h-1.5 rounded-full ${
-                            customer.status === 'active' ? 'bg-green-600' : 'bg-red-600'
+                            customer.status === 'in-progress' ? 'bg-green-600' : 'bg-red-600'
                           } mr-1.5`}></span>
                           {customer.status}
                         </motion.span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <motion.button 
+                        
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
                         >
                           <FiEye className="w-4 h-4 mr-1.5" />
-                          View
+                          Change Status
                         </motion.button>
+                        <Link to={`/dashboard/customers/${customer?.userId}`}>
+                          <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
+                          >
+                            <FiEye className="w-4 h-4 mr-1.5" />
+                            View
+                          </motion.button>
+                        </Link>
                         <motion.button 
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}

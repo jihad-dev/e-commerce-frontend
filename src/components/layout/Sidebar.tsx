@@ -10,7 +10,8 @@ import {
   Menu, 
   X, 
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Home
 } from 'lucide-react';
 
 interface SidebarLinkProps {
@@ -128,6 +129,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       to: '/settings',
       icon: <Settings size={20} />,
       label: 'Settings',
+    },
+    {
+      to: '/',
+      icon: <Home size={20} />,
+      label: 'Home',
     },
   ];
 
