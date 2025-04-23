@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { FiSearch, FiPlus, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiSearch, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGetAllAdminsQuery, useGetAllUsersQuery } from "../../Redux/features/auth/authApi";
+import { useGetAllUsersQuery, } from "../../Redux/features/auth/authApi";
 
 const Customers = () => {
-  // const {data : users} = useGetAllUsersQuery(undefined);
-  // console.log(users);
-  const {data : admins} = useGetAllAdminsQuery(undefined);
-  console.log(admins);
+  const {data : users} = useGetAllUsersQuery(undefined);
+  console.log(users);
+
   
   // dummy data
   const [customers, setCustomers] = useState([

@@ -1,7 +1,7 @@
-import baseApi from "../../api/baseApi";
+import { baseApi } from "../../api/baseApi";
 
 const productsApi = baseApi.injectEndpoints({
-    endpoints: (builder) => ({
+    endpoints: (builder: any) => ({
     
         getFeaturedProducts: builder.query({
             query: () => {
@@ -31,7 +31,7 @@ const productsApi = baseApi.injectEndpoints({
             }
         }),
         getProductsByCategory: builder.query({
-            query: (category) => {
+            query: (category: string) => {
                 let url = '/products';
                 url += `?category=${category}`;
                 return {

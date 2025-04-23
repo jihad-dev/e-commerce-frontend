@@ -1,7 +1,7 @@
-import baseApi from "../../api/baseApi";
+import { baseApi } from "../../api/baseApi";
 
 const categoryApi = baseApi.injectEndpoints({
-    endpoints: (builder) => ({
+    endpoints: (builder: any) => ({
         getAllCategories: builder.query({
             query: () => '/categories',
             transformResponse: (response: any) => {

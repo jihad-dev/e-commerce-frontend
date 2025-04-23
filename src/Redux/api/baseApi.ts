@@ -1,17 +1,69 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-const baseApi = createApi({
-    reducerPath: 'baseApi',
-    baseQuery: fetchBaseQuery({ 
-        baseUrl: 'http://localhost:5000/api/v1', 
-        credentials: 'include',
+import { BaseQueryApi, BaseQueryFn, createApi, DefinitionType, FetchArgs, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-    }),
-    endpoints: () => ({
-      
-    }),
+import { toast } from "sonner";
+// Remove unused import
+// import { useAppSelector } from "../hooks";
+import { logout, setUser } from "../features/auth/authSlice";
+import { RootState } from "../store"; // Assuming your RootState is exported from here
+
+const baseQuery = fetchBaseQuery({
+  baseUrl: 'http://localhost:5000/api/v1',
+  credentials: 'include',
+  prepareHeaders: (headers, { getState }) => { // Add { getState } parameter
+    const token = (getState() as RootState).auth.token; // Use getState() to access the token
+    if (token) {
+      headers.set('authorization', `${token}`)
+    }
+    return headers;
+  }
+
 })
 
-export default baseApi
+// token expired hola new refresh token generate code 
+const baseQueryWithRefreshToken: BaseQueryFn<
+  FetchArgs,
+  BaseQueryApi,
+  DefinitionType
+> = async (args, api, extraOptions): Promise<any> => {
+  let result = await baseQuery(args, api, extraOptions);
+  if (result?.error?.status === 404) {
+    toast.error((result?.error?.data as any)?.message)
+  }
+  if (result?.error?.status === 403) {
+    toast.error((result?.error?.data as any)?.message)
+  }
+  if (result?.error?.status === 401) {
+    const res = await fetch('http://localhost:5000/api/v1/auth/refresh-token', {
+      method: 'POST',
+      credentials: 'include',
+    });
 
+    const data = await res.json();
 
+    if (data?.data?.accessToken) {
+      // We also need to get the user state here without using a hook
+      const user = (api.getState() as RootState).auth.user; // Use api.getState() here as well
 
+      api.dispatch(
+        setUser({
+          user,
+          token: data.data.accessToken,
+        })
+      );
+
+      result = await baseQuery(args, api, extraOptions);
+    } else {
+      api.dispatch(logout());
+    }
+  }
+
+  return result;
+};
+
+export const baseApi = createApi({
+  reducerPath: 'baseApi',
+  baseQuery: baseQueryWithRefreshToken,
+  endpoints: () => ({
+
+  })
+})
