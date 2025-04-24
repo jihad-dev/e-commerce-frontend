@@ -13,6 +13,7 @@ import Profile from "../Pages/Profile/Profile";
 import DynamicCategory from "../utils/DynamicCategory";
 import Cart from "../Pages/Cart/Cart";
 import ViewUserInfo from "../Pages/AdminPage/ViewUserInfo";
+import ChangeStatus from "../Pages/AdminPage/ChangeStatus";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/customers/:id",
         element: <PrivateRoute><ViewUserInfo/></PrivateRoute>
+      },
+      {
+        path: "/dashboard/customers/change-status/:id",
+        element: <PrivateRoute><ChangeStatus/></PrivateRoute>
       },
       // {
       //   path: "/dashboard/payment",

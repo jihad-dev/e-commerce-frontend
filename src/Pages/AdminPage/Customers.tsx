@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { FiSearch, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGetAllUsersQuery, } from "../../Redux/features/auth/authApi";
+
 import Loader from "../../utils/Loader";
 import { Link } from "react-router-dom";
+import { useGetAllUsersQuery } from "../../Redux/features/admin/adminApi";
+
 
 const Customers = () => {
- 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
- 
-  const {data : users,isLoading} = useGetAllUsersQuery(undefined);
-  console.log(users?.data);
 
-  if(isLoading){
+
+  const { data: users, isLoading, refetch } = useGetAllUsersQuery(undefined);
+
+
+  if (isLoading) {
     return <Loader />
   }
 
@@ -52,24 +54,24 @@ const Customers = () => {
   };
 
   // Filter and sort customers
-    const filteredCustomers = Array.isArray(users) 
-      ? users.filter((customer: any) => {
-        const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = filterStatus === 'all' || customer.status === filterStatus;
-        return matchesSearch && matchesStatus;
-      }).sort((a: any, b: any) => {
-        switch(sortBy) {
-          case 'orders':
-            return b.orders - a.orders;
-          case 'spent':
-            return b.totalSpent - a.totalSpent;
-          case 'recent':
-            return new Date(b.lastOrder).getTime() - new Date(a.lastOrder).getTime();
-          default:
-            return a.name.localeCompare(b.name);
-        }
-      })
+  const filteredCustomers = Array.isArray(users)
+    ? users.filter((customer: any) => {
+      const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = filterStatus === 'all' || customer.status === filterStatus;
+      return matchesSearch && matchesStatus;
+    }).sort((a: any, b: any) => {
+      switch (sortBy) {
+        case 'orders':
+          return b.orders - a.orders;
+        case 'spent':
+          return b.totalSpent - a.totalSpent;
+        case 'recent':
+          return new Date(b.lastOrder).getTime() - new Date(a.lastOrder).getTime();
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    })
     : []; // Default to empty array if users is not an array
 
   // Get current customers for pagination
@@ -82,7 +84,7 @@ const Customers = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -90,12 +92,12 @@ const Customers = () => {
     >
       <div className="max-w-[1400px] mx-auto space-y-6">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           className="bg-white rounded-2xl shadow-md p-4 sm:p-6"
         >
           <div className="text-center">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -103,7 +105,7 @@ const Customers = () => {
             >
               Customer Management
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -115,15 +117,15 @@ const Customers = () => {
         </motion.div>
 
         {/* Stats Cards */}
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {[
-            { title: "Total Customers", value:users && users?.data?.length ? users?.data?.length : 0, change: "↑ 12%", isPositive: true },
-            { title: "Active Customers", value: Array.isArray(users) ? users?.data?.filter((user: {status: string}) => user.status === 'active').length : 0, change: "↑ 8%", isPositive: true },
-            { title: "Total Revenue", value: Array.isArray(users) ? `$${users?.data?.reduce((acc: number, user: {totalSpent?: number}) => acc + (user.totalSpent || 0), 0).toLocaleString()}` : '$0', change: "↑ 15%", isPositive: true },
-            { title: "Avg. Order Value", value: Array.isArray(users) && users.length > 0 ? `$${(users?.data?.reduce((acc: number, user: {totalSpent?: number}) => acc + (user.totalSpent || 0), 0) / users?.data?.length).toFixed(2)}` : '$0', change: "↓ 3%", isPositive: false }
+            { title: "Total Customers", value: users && users?.data?.length ? users?.data?.length : 0, change: "↑ 12%", isPositive: true },
+            { title: "Active Customers", value: Array.isArray(users) ? users?.data?.filter((user: { status: string }) => user.status === 'active').length : 0, change: "↑ 8%", isPositive: true },
+            { title: "Total Revenue", value: Array.isArray(users) ? `$${users?.data?.reduce((acc: number, user: { totalSpent?: number }) => acc + (user.totalSpent || 0), 0).toLocaleString()}` : '$0', change: "↑ 15%", isPositive: true },
+            { title: "Avg. Order Value", value: Array.isArray(users) && users.length > 0 ? `$${(users?.data?.reduce((acc: number, user: { totalSpent?: number }) => acc + (user.totalSpent || 0), 0) / users?.data?.length).toFixed(2)}` : '$0', change: "↓ 3%", isPositive: false }
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -141,12 +143,12 @@ const Customers = () => {
         </motion.div>
 
         {/* Filters Section */}
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           className="bg-white rounded-2xl shadow-md p-4 sm:p-6"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <motion.div 
+            <motion.div
               whileTap={{ scale: 0.98 }}
               className="relative"
             >
@@ -159,8 +161,8 @@ const Customers = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </motion.div>
-            
-            <motion.select 
+
+            <motion.select
               whileTap={{ scale: 0.98 }}
               className="w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               value={sortBy}
@@ -186,7 +188,7 @@ const Customers = () => {
         </motion.div>
 
         {/* Table Section */}
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           className="bg-white rounded-2xl shadow-md overflow-hidden"
         >
@@ -203,7 +205,7 @@ const Customers = () => {
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
                 <AnimatePresence>
-                  {users?.data?.map((customer: any,index: any) => (
+                  {users?.data?.map((customer: any, index: any) => (
                     <motion.tr
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
@@ -214,14 +216,14 @@ const Customers = () => {
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <motion.div 
+                          <motion.div
                             whileHover={{ scale: 1.1 }}
                             className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-200 to-purple-200 flex items-center justify-center shadow-inner"
                           >
                             <span className="text-sm font-semibold text-blue-800">{customer?.name?.charAt(0)}</span>
                           </motion.div>
                           <div className="ml-4">
-                            <div className="text-sm font-semibold text-gray-900">{customer?.name}</div>
+                            <div className="text-sm font-semibold text-gray-900">{customer?.name} * {customer?.userId}</div>
                             <div className="text-xs text-gray-500 md:hidden">{customer?.email}</div>
                           </div>
                         </div>
@@ -235,32 +237,35 @@ const Customers = () => {
                         <div className="text-xs text-gray-500">${customer?.totalSpent} spent</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <motion.span 
+                        <motion.span
                           whileHover={{ scale: 1.05 }}
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            customer?.status === 'in-progress'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${customer?.status === 'in-progress'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                            }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            customer.status === 'in-progress' ? 'bg-green-600' : 'bg-red-600'
-                          } mr-1.5`}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${customer.status === 'in-progress' ? 'bg-green-600' : 'bg-red-600'
+                            } mr-1.5`}></span>
                           {customer.status}
                         </motion.span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <motion.button 
+
+
+
+                        <Link to={`/dashboard/customers/change-status/${customer?._id}`}>
+                          <button
                         
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
-                        >
-                          <FiEye className="w-4 h-4 mr-1.5" />
-                          Change Status
-                        </motion.button>
+                            className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
+
+                          >
+                            Change Status
+                          </button>
+                        </Link>
+
+
                         <Link to={`/dashboard/customers/${customer?.userId}`}>
-                          <motion.button 
+                          <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
@@ -269,7 +274,7 @@ const Customers = () => {
                             View
                           </motion.button>
                         </Link>
-                        <motion.button 
+                        <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
@@ -291,22 +296,20 @@ const Customers = () => {
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage === 1 
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 Previous
               </button>
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 Next
               </button>
@@ -326,11 +329,10 @@ const Customers = () => {
                   <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
-                      currentPage === 1
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-gray-500 hover:bg-gray-50'
-                    }`}
+                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${currentPage === 1
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-500 hover:bg-gray-50'
+                      }`}
                   >
                     <span className="sr-only">Previous</span>
                     <FiChevronLeft className="h-5 w-5" />
@@ -339,11 +341,10 @@ const Customers = () => {
                     <button
                       key={index}
                       onClick={() => paginate(index + 1)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === index + 1
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === index + 1
+                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
                     >
                       {index + 1}
                     </button>
@@ -351,11 +352,10 @@ const Customers = () => {
                   <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
-                      currentPage === totalPages
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-gray-500 hover:bg-gray-50'
-                    }`}
+                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${currentPage === totalPages
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-500 hover:bg-gray-50'
+                      }`}
                   >
                     <span className="sr-only">Next</span>
                     <FiChevronRight className="h-5 w-5" />
