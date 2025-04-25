@@ -6,7 +6,7 @@ const adminApi = baseApi.injectEndpoints({
       getAllUsers: builder.query({
          query: () => '/users/all-user',
          method: 'GET',
-        
+         providesTags: ['users']
       }),
       changeStatus: builder.mutation({
          query: (data:{id:string, status:string}) => ({
@@ -16,6 +16,7 @@ const adminApi = baseApi.injectEndpoints({
                 status: data?.status
             }
          }),
+         invalidatesTags: ['users']
       }),
       //create admin
       createAdmin: builder.mutation({
@@ -23,19 +24,35 @@ const adminApi = baseApi.injectEndpoints({
             url: '/admins/create-admin',
             method: 'POST',
             body: data
-         })
+         }),
+         invalidatesTags: ['admins']
       }),
-      changeRole: builder.mutation({
-         query: (data:{id:string, role:string}) => ({
-            url: `/users/${data?.id}`,
-            method: 'PATCH',
-            body: {
-               role: data?.role
-            }
-         })
+      //get single admin
+      getSingleAdmin: builder.query({
+         query: (id:string) => ({
+            url: `/admins/${id}`,
+            method: 'GET',
+         }),
+         providesTags: ['admins']
+      }),
+      //delete admin
+      deleteAdmin: builder.mutation({
+         query: (id:string) => ({
+            url: `/admins/${id}`,
+            method: 'DELETE',
+         }),
+         invalidatesTags: ['admins']
+      }),
+      //delete user
+      deleteUser: builder.mutation({
+         query: (id:string) => ({
+            url: `/users/${id}`,
+            method: 'DELETE',
+         }),
+         invalidatesTags: ['users']
       })
      
    }),
 })
 
-export const { useGetAllUsersQuery, useChangeStatusMutation, useCreateAdminMutation, useChangeRoleMutation } = adminApi;
+export const { useGetAllUsersQuery, useChangeStatusMutation, useCreateAdminMutation, useGetSingleAdminQuery , useDeleteAdminMutation, useDeleteUserMutation} = adminApi;

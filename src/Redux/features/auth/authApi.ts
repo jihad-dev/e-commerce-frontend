@@ -22,6 +22,7 @@ const authApi = baseApi.injectEndpoints({
                 url: '/admins',
                 method: 'GET',
             }),
+            providesTags: ['admins'],
             transformResponse: (response: any) => response?.data,
         }),
     }),

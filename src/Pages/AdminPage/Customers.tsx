@@ -3,7 +3,8 @@ import { FiSearch, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "../../utils/Loader";
 import { Link } from "react-router-dom";
-import { useGetAllUsersQuery } from "../../Redux/features/admin/adminApi";
+import { useDeleteUserMutation, useGetAllUsersQuery } from "../../Redux/features/admin/adminApi";
+import Swal from "sweetalert2";
 
 
 const Customers = () => {
@@ -18,12 +19,68 @@ const Customers = () => {
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
-
+  const [deleteUser] = useDeleteUserMutation();
 
   if (isLoading) {
     return <Loader />
   }
 
+  // delete user
+ 
+     const handleDelete = async (user:any) => {
+      Swal.fire({
+          title: "Delete Admin Account",
+          text: `Are you sure you want to delete ${user.name}'s account? This action cannot be undone.`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+          confirmButtonColor: "#dc2626",
+          cancelButtonColor: "#6b7280",
+          customClass: {
+              popup: "rounded-xl",
+              title: "text-xl font-semibold text-gray-900",
+              htmlContainer: "text-gray-600",
+              confirmButton: "px-4 py-2 text-sm font-medium rounded-lg",
+              cancelButton: "px-4 py-2 text-sm font-medium rounded-lg"
+          }
+      }).then(async (result) => {
+          if (result.isConfirmed) {
+              try {
+                  const res = await deleteUser(user._id).unwrap();
+                  // Success notification
+                  Swal.fire({
+                      title: "Account Deleted",
+                      text: `${user.name}'s account has been successfully deleted.`,
+                      icon: "success",
+                      confirmButtonColor: "#3b82f6",
+                      customClass: {
+                          popup: "rounded-xl",
+                          title: "text-xl font-semibold text-gray-900",
+                          htmlContainer: "text-gray-600",
+                          confirmButton: "px-4 py-2 text-sm font-medium rounded-lg"
+                      }
+                  });
+
+              } catch (error: any) {
+                  console.error("Delete mutation failed:", error);
+                  // Safely access the error message
+                  const errorMessage = error?.data?.message || 'An error occurred while deleting the admin.';
+                  Swal.fire({
+                      title: "Error",
+                      text: errorMessage,
+                      icon: "error"
+                  });
+              }
+          } else {
+              Swal.fire({
+                  title: "Cancelled",
+                  text: "The admin account was not deleted.",
+                  icon: "error"
+              });
+          }
+      });
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -278,6 +335,7 @@ const Customers = () => {
                         </Link>
                         <>
                           <motion.button
+                            onClick={() => handleDelete(customer)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         
@@ -286,7 +344,7 @@ const Customers = () => {
                             <FiTrash2 className="w-4 h-4 mr-1.5" />
                             Delete
                           </motion.button>
-                           
+                          
 
                         </>
                       </td>

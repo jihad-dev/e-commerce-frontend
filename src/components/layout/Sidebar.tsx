@@ -108,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       label: 'Products',
       children: [
         { to: '/dashboard/products', label: 'All Products' },
-        { to: '/dashboard/products/add', label: 'Add Product' },
+        { to: '/dashboard/products/add-product', label: 'Add Product' },
         { to: '/dashboard/products/categories', label: 'Categories' },
       ],
     },
@@ -131,11 +131,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       to: '/dashboard/All-admin',
       icon: <Users2 size={20} />,
       label: 'All Admin',
-    },
-    {
-      to: '/dashboard/admin/change-user-role',
-      icon: <UserCog size={20} />,
-      label: 'Change User Role',
     },
     {
       to: '/',

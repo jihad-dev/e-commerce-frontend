@@ -18,6 +18,8 @@ import AllProducts from "../Pages/AdminPage/AllProducts";
 import AllAdmin from "../Pages/AdminPage/AllAdmin";
 import CreateAdmin from "../Pages/AdminPage/CreateAdmin";
 import ChangeUserRole from "../Pages/AdminPage/ChangeUserRole";
+import ViewAdminInfo from "../Pages/AdminPage/ViewAdminInfo";
+import AddProduct from "../Pages/AdminPage/AddProduct";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -91,7 +93,14 @@ export const router = createBrowserRouter([
         path: "/dashboard/admin/create-admin",
         element: <PrivateRoute><CreateAdmin/></PrivateRoute>
       },
-     
+      {
+        path: "/dashboard/admin/admin-info/:id",
+        element: <PrivateRoute><ViewAdminInfo/></PrivateRoute>
+      },
+      {
+        path: "/dashboard/products/add-product",
+        element: <PrivateRoute><AddProduct/></PrivateRoute>
+      },
       // {
       //   path: "/dashboard/payment",
       //   element: <Payment></Payment>

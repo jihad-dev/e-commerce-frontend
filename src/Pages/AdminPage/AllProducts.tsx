@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Edit, Eye, Trash2, ArrowUpDown, Badge } from 'lucide-react';
 
 import Button from '../../components/ui/Button';
-import { useGetAllProductsQuery } from '../../Redux/features/products/productsApi';
+import { useDeleteProductMutation, useGetAllProductsQuery } from '../../Redux/features/products/productsApi';
 import Loader from '../../utils/Loader';
+import Swal from 'sweetalert2';
+import { Link } from 'react-router-dom';
 
 interface Product {
     _id: string;
@@ -19,13 +21,70 @@ interface Product {
 
 const AllProducts = () => {
     const { data: products = [], isLoading } = useGetAllProductsQuery(undefined);
+    const [deleteProduct] = useDeleteProductMutation();
     const [sortField, setSortField] = useState<keyof Product | null>(null);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
     if (isLoading) {
         return <Loader />
     }
+    //delete product
+    const handleDelete = async (product: Product) => {
 
+        Swal.fire({
+            title: "Delete Product",
+            text: `Are you sure you want to delete ${product.title}'s product? This action cannot be undone.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#6b7280",
+            customClass: {
+                popup: "rounded-xl",
+                title: "text-xl font-semibold text-gray-900",
+                htmlContainer: "text-gray-600",
+                confirmButton: "px-4 py-2 text-sm font-medium rounded-lg",
+                cancelButton: "px-4 py-2 text-sm font-medium rounded-lg"
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await deleteProduct(product._id).unwrap();
+
+                    // Success notification
+                    Swal.fire({
+                        title: "Product Deleted",
+                        text: `${product.title}'s product has been successfully deleted.`,
+                        icon: "success",
+                        confirmButtonColor: "#3b82f6",
+                        customClass: {
+                            popup: "rounded-xl",
+                            title: "text-xl font-semibold text-gray-900",
+                            htmlContainer: "text-gray-600",
+                            confirmButton: "px-4 py-2 text-sm font-medium rounded-lg"
+                        }
+                    });
+
+                } catch (error: any) {
+                    console.error("Delete mutation failed:", error);
+                    // Safely access the error message
+                    const errorMessage = error?.data?.message || 'An error occurred while deleting the admin.';
+                    Swal.fire({
+                        title: "Error",
+                        text: errorMessage,
+                        icon: "error"
+                    });
+                }
+            } else {
+                Swal.fire({
+                    title: "Cancelled",
+                    text: "The admin account was not deleted.",
+                    icon: "error"
+                });
+            }
+        });
+    };
     const handleSort = (field: keyof Product) => {
         if (!products) return;
 
@@ -77,9 +136,10 @@ const AllProducts = () => {
                             <Button variant="outline" size="sm">
                                 Filter
                             </Button>
-                            <Button variant="primary" size="sm">
-                                Add Product
-                            </Button>
+                            <Link to="/dashboard/products/add-product">
+                                <Button className='cursor-pointer' variant="primary" size="sm">
+                                    Add Product
+                                </Button></Link>
                         </div>
                     </div>
                 </div>
@@ -177,7 +237,7 @@ const AllProducts = () => {
                                                     <Edit className="h-4 w-4" />
                                                     <span className="sr-only">Edit</span>
                                                 </Button>
-                                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900 hover:bg-red-50">
+                                                <Button onClick={() => handleDelete(product)} variant="ghost" size="sm" className="text-red-600 hover:text-red-900 hover:bg-red-50">
                                                     <Trash2 className="h-4 w-4" />
                                                     <span className="sr-only">Delete</span>
                                                 </Button>
@@ -206,7 +266,7 @@ const AllProducts = () => {
                                             <Button variant="ghost" size="sm" className="text-yellow-600">
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="ghost" size="sm" className="text-red-600">
+                                            <Button onClick={() => handleDelete(product)} variant="ghost" size="sm" className="text-red-600">
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>

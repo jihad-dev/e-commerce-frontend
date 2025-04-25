@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useGetAllAdminsQuery } from "../../Redux/features/auth/authApi";
 import Loader from "../../utils/Loader";
-
+import Swal from "sweetalert2";
+import { useDeleteAdminMutation } from "../../Redux/features/admin/adminApi";
 interface Admin {
     _id: string;
     avatar?: string;
@@ -23,6 +24,7 @@ const AllAdmin = () => {
         refetchOnFocus: true,
         refetchOnReconnect: true,
     });
+    const [deleteAdmin] = useDeleteAdminMutation();
 
     const admins = (adminsData as Admin[]) || [];
 
@@ -38,6 +40,65 @@ const AllAdmin = () => {
     if (isLoading) {
         return <Loader />;
     }
+    // delete admin
+    const handleDelete = async (admin: Admin) => {
+        Swal.fire({
+            title: "Delete Admin Account",
+            text: `Are you sure you want to delete ${admin.name}'s account? This action cannot be undone.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#6b7280",
+            customClass: {
+                popup: "rounded-xl",
+                title: "text-xl font-semibold text-gray-900",
+                htmlContainer: "text-gray-600",
+                confirmButton: "px-4 py-2 text-sm font-medium rounded-lg",
+                cancelButton: "px-4 py-2 text-sm font-medium rounded-lg"
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await deleteAdmin(admin._id).unwrap();
+                    // Success notification
+                    Swal.fire({
+                        title: "Account Deleted",
+                        text: `${admin.name}'s account has been successfully deleted.`,
+                        icon: "success",
+                        confirmButtonColor: "#3b82f6",
+                        customClass: {
+                            popup: "rounded-xl",
+                            title: "text-xl font-semibold text-gray-900",
+                            htmlContainer: "text-gray-600",
+                            confirmButton: "px-4 py-2 text-sm font-medium rounded-lg"
+                        }
+                    });
+
+                } catch (error: any) {
+                    console.error("Delete mutation failed:", error);
+                    // Safely access the error message
+                    const errorMessage = error?.data?.message || 'An error occurred while deleting the admin.';
+                    Swal.fire({
+                        title: "Error",
+                        text: errorMessage,
+                        icon: "error"
+                    });
+                }
+            } else {
+                Swal.fire({
+                    title: "Cancelled",
+                    text: "The admin account was not deleted.",
+                    icon: "error"
+                });
+            }
+        });
+    };
+
+
+
+
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -132,6 +193,7 @@ const AllAdmin = () => {
                                     <span className="ml-2 text-sm font-medium">Edit</span>
                                 </button>
                                 <button
+                                    onClick={() => handleDelete(admin)}
                                     className="flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                 >
                                     <FiTrash2 className="h-5 w-5" />
@@ -229,7 +291,7 @@ const AllAdmin = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div className="flex items-center justify-end space-x-3">
                                             <Link
-                                                to={`/dashboard/admin/${admin.userId}`}
+                                                to={`/dashboard/admin/admin-info/${admin._id}`}
                                                 className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="View Details"
                                             >
@@ -242,6 +304,7 @@ const AllAdmin = () => {
                                                 <FiEdit2 className="h-5 w-5" />
                                             </button>
                                             <button
+                                                onClick={() => handleDelete(admin)}
                                                 className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Delete Admin"
                                             >
