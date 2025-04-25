@@ -14,6 +14,10 @@ import DynamicCategory from "../utils/DynamicCategory";
 import Cart from "../Pages/Cart/Cart";
 import ViewUserInfo from "../Pages/AdminPage/ViewUserInfo";
 import ChangeStatus from "../Pages/AdminPage/ChangeStatus";
+import AllProducts from "../Pages/AdminPage/AllProducts";
+import AllAdmin from "../Pages/AdminPage/AllAdmin";
+import CreateAdmin from "../Pages/AdminPage/CreateAdmin";
+import ChangeUserRole from "../Pages/AdminPage/ChangeUserRole";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -65,7 +69,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dashboard/products",
-        element: <h3>Productswerwrwerwer</h3>
+        element: <PrivateRoute><AllProducts/></PrivateRoute>
       },
       {
         path: "/dashboard/customers",
@@ -79,6 +83,15 @@ export const router = createBrowserRouter([
         path: "/dashboard/customers/change-status/:id",
         element: <PrivateRoute><ChangeStatus/></PrivateRoute>
       },
+      {
+        path: "/dashboard/All-admin",
+        element: <PrivateRoute><AllAdmin/></PrivateRoute>
+      },
+      {
+        path: "/dashboard/admin/create-admin",
+        element: <PrivateRoute><CreateAdmin/></PrivateRoute>
+      },
+     
       // {
       //   path: "/dashboard/payment",
       //   element: <Payment></Payment>

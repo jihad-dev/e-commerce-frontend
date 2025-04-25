@@ -9,20 +9,22 @@ const authApi = baseApi.injectEndpoints({
                 body: userInfo,
             }),
         }),
-        getAllUsers: builder.query({
-            query: () => ({
-                url: '/users/all-user',
+
+        getSingleUser: builder.query({
+            query: (id: string) => ({
+                url: `/users/${id}`,
                 method: 'GET',
-                transformResponse: (response: any) => response?.data,
             }),
+            transformResponse: (response: any) => response?.data,
         }),
         getAllAdmins: builder.query({
             query: () => ({
                 url: '/admins',
                 method: 'GET',
             }),
+            transformResponse: (response: any) => response?.data,
         }),
     }),
 })
 
-export const { useLoginMutation, useGetAllUsersQuery , useGetAllAdminsQuery} = authApi;
+export const { useLoginMutation, useGetAllAdminsQuery, useGetSingleUserQuery} = authApi;

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { FiSearch, FiEye, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-
 import Loader from "../../utils/Loader";
 import { Link } from "react-router-dom";
 import { useGetAllUsersQuery } from "../../Redux/features/admin/adminApi";
@@ -14,13 +13,17 @@ const Customers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-
-  const { data: users, isLoading, refetch } = useGetAllUsersQuery(undefined);
+  const { data: users, isLoading } = useGetAllUsersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
 
   if (isLoading) {
     return <Loader />
   }
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -198,7 +201,8 @@ const Customers = () => {
                 <tr className="bg-gray-50">
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Contact</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Activity</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -232,10 +236,11 @@ const Customers = () => {
                         <div className="text-sm text-gray-600">{customer?.email}</div>
                         <div className="text-xs text-gray-500">Last order: {customer?.lastOrder}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                        <div className="text-sm text-gray-900">{customer?.orders} orders</div>
-                        <div className="text-xs text-gray-500">${customer?.totalSpent} spent</div>
-                      </td>
+                     
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{customer?.role}</div>
+                        </td>
+
                       <td className="px-6 py-4 whitespace-nowrap">
                         <motion.span
                           whileHover={{ scale: 1.05 }}
@@ -250,38 +255,40 @@ const Customers = () => {
                         </motion.span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-
-
-
                         <Link to={`/dashboard/customers/change-status/${customer?._id}`}>
-                          <button
-                        
-                            className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
-
-                          >
-                            Change Status
-                          </button>
-                        </Link>
-
-
-                        <Link to={`/dashboard/customers/${customer?.userId}`}>
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
+                            className="inline-flex cursor-pointer items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
+                          >
+                            <FiChevronRight className="w-4 h-4 mr-1.5" />
+                            Change Status
+                          </motion.button>
+                        </Link>
+                    
+                        <Link to={`/dashboard/customers/${customer?._id}`}>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="inline-flex cursor-pointer items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors mr-2"
                           >
                             <FiEye className="w-4 h-4 mr-1.5" />
                             View
                           </motion.button>
                         </Link>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                        >
-                          <FiTrash2 className="w-4 h-4 mr-1.5" />
-                          Delete
-                        </motion.button>
+                        <>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        
+                            className="inline-flex cursor-pointer items-center px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                          >
+                            <FiTrash2 className="w-4 h-4 mr-1.5" />
+                            Delete
+                          </motion.button>
+                           
+
+                        </>
                       </td>
                     </motion.tr>
                   ))}

@@ -11,7 +11,9 @@ import {
   X, 
   ChevronDown,
   ChevronRight,
-  Home
+  Home,
+  Users2,
+  UserCog
 } from 'lucide-react';
 
 interface SidebarLinkProps {
@@ -126,9 +128,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       label: 'Analytics',
     },
     {
-      to: '/settings',
-      icon: <Settings size={20} />,
-      label: 'Settings',
+      to: '/dashboard/All-admin',
+      icon: <Users2 size={20} />,
+      label: 'All Admin',
+    },
+    {
+      to: '/dashboard/admin/change-user-role',
+      icon: <UserCog size={20} />,
+      label: 'Change User Role',
     },
     {
       to: '/',

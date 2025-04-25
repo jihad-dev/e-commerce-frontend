@@ -5,7 +5,8 @@ const adminApi = baseApi.injectEndpoints({
    endpoints: (builder: any) => ({
       getAllUsers: builder.query({
          query: () => '/users/all-user',
-         providesTags: ['users']
+         method: 'GET',
+        
       }),
       changeStatus: builder.mutation({
          query: (data:{id:string, status:string}) => ({
@@ -15,10 +16,26 @@ const adminApi = baseApi.injectEndpoints({
                 status: data?.status
             }
          }),
-         invalidatesTags: ['users']
+      }),
+      //create admin
+      createAdmin: builder.mutation({
+         query: (data: any) => ({
+            url: '/admins/create-admin',
+            method: 'POST',
+            body: data
+         })
+      }),
+      changeRole: builder.mutation({
+         query: (data:{id:string, role:string}) => ({
+            url: `/users/${data?.id}`,
+            method: 'PATCH',
+            body: {
+               role: data?.role
+            }
+         })
       })
      
    }),
 })
 
-export const { useGetAllUsersQuery, useChangeStatusMutation } = adminApi;
+export const { useGetAllUsersQuery, useChangeStatusMutation, useCreateAdminMutation, useChangeRoleMutation } = adminApi;

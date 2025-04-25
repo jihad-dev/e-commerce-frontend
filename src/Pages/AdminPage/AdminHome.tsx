@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
-import { FiUsers, FiShoppingBag, FiDollarSign, FiTrendingUp, FiPackage, FiActivity } from 'react-icons/fi';
+import { FiUsers, FiShoppingBag, FiDollarSign, FiPackage, FiActivity } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
+import { useGetAllUsersQuery } from '../../Redux/features/admin/adminApi';
 const AdminHome = () => {
+  const { data: users } = useGetAllUsersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -90,7 +95,7 @@ const AdminHome = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-500">Total Customers</p>
-                <h3 className="text-2xl font-bold">1,234</h3>
+                <h3 className="text-2xl font-bold">{users?.data?.length}</h3>
                 <p className="text-xs text-green-600">+8% from last month</p>
               </div>
             </div>
