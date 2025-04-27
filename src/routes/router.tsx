@@ -20,6 +20,9 @@ import CreateAdmin from "../Pages/AdminPage/CreateAdmin";
 import ChangeUserRole from "../Pages/AdminPage/ChangeUserRole";
 import ViewAdminInfo from "../Pages/AdminPage/ViewAdminInfo";
 import AddProduct from "../Pages/AdminPage/AddProduct";
+import ViewProductFullDetails from "../Pages/AdminPage/ViewProductFullDetails";
+import AllCategories from "../Pages/AdminPage/AllCategories";
+import AddCategories from "../Pages/AdminPage/AddCategories";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -101,6 +104,19 @@ export const router = createBrowserRouter([
         path: "/dashboard/products/add-product",
         element: <PrivateRoute><AddProduct/></PrivateRoute>
       },
+      {
+        path: "/dashboard/products/view-product/:id",
+        element: <PrivateRoute><ViewProductFullDetails/></PrivateRoute>
+      },
+      {
+        path: "/dashboard/categories",
+        element: <PrivateRoute><AllCategories/></PrivateRoute>
+      },
+      {
+        path: "/dashboard/categories/add-category",
+        element: <PrivateRoute><AddCategories/></PrivateRoute>
+      },
+
       // {
       //   path: "/dashboard/payment",
       //   element: <Payment></Payment>

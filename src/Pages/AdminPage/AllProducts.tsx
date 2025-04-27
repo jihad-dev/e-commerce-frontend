@@ -229,10 +229,13 @@ const AllProducts = () => {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end space-x-2">
-                                                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900 hover:bg-blue-50">
-                                                    <Eye className="h-4 w-4" />
-                                                    <span className="sr-only">View</span>
-                                                </Button>
+
+                                                <Link to={`/dashboard/products/view-product/${product._id}`}>
+                                                    <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900 hover:bg-blue-50">
+                                                        <Eye className="h-4 w-4" />
+                                                        <span className="sr-only">View</span>
+                                                    </Button>
+                                                </Link>
                                                 <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50">
                                                     <Edit className="h-4 w-4" />
                                                     <span className="sr-only">Edit</span>

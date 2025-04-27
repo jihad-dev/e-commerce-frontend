@@ -113,6 +113,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       ],
     },
     {
+      to: '/dashboard/categories',
+      icon: <Package size={20} />,
+      label: 'Categories',
+      children: [
+        { to: '/dashboard/categories', label: 'All Categories' },
+        { to: '/dashboard/categories/add-category', label: 'Add Category' },
+      ],
+    },
+    {
       to: '/orders',
       icon: <ShoppingCart size={20} />,
       label: 'Orders',

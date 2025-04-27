@@ -50,7 +50,7 @@ const ProductCard: React.FC<{ product: Product, index: number }> = ({ product, i
             animate="visible"
             custom={index}
             whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.1)" }}
-            className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative group"
+            className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative group cursor-pointer"
         >
             <div className="relative pb-[66.66%]"> {/* Aspect ratio container for image */}
                 <img
