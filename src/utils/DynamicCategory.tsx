@@ -1,21 +1,20 @@
 import { useParams } from "react-router-dom";
 import { useGetProductsByCategoryQuery } from "../Redux/features/products/productsApi";
-
-// import ProductCard from "./ProductCard";
 import { motion } from "framer-motion";
 import ProductCard from "./ProductCard";
-// import ProductCard from "../components/ProductCard/ProductCard";
+import Loader from "./Loader";
 const DynamicCategory = () => {
    
     const {category} = useParams();
-    const {data: products} = useGetProductsByCategoryQuery(category);
-    console.log(category);
-    console.log(products);
+    const {data: products , isLoading} = useGetProductsByCategoryQuery(category);
+    if(isLoading){
+        return <Loader/>
+    }
     return (
         <div>
-          Content
+         
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products?.map((product: any, index: number) => (
+            {products && products?.map((product: any, index: number) => (
               <motion.div 
                 key={index}
                 initial="hidden"

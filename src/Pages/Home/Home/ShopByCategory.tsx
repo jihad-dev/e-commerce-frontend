@@ -29,7 +29,7 @@ const ShopByCategory = () => {
                     modules={[FreeMode, Pagination]}
                     className="mySwiper"
                 >
-                    {categoriesData?.map((category: any) => (
+                    { categoriesData && categoriesData?.map((category: any) => (
                         <SwiperSlide key={category._id}>
                             <Link 
                                 to={`/category/${category?.name}`} 

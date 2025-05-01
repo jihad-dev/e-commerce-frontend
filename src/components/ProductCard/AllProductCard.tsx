@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../Redux/hooks';
-import { useAddToCartMutation } from '../../Redux/features/cart/cartApi';
+import { useAddToCartMutation, useGetCartQuery } from '../../Redux/features/cart/cartApi';
 import { toast } from 'sonner';
+import { log } from 'console';
 // removed: import styles from './ProductCard.module.css';
 
 // Define the structure of a Product based on the provided JSON
@@ -56,19 +57,32 @@ const CartIcon = () => (
 );
 
 const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
-    const [cart, {isLoading}] = useAddToCartMutation();
-    const navigate = useNavigate();
     const user = useAppSelector((state) => state.auth.user);
+    const { data: cartItems } = useGetCartQuery(undefined, {
+        skip: !user,
+        refetchOnMountOrArgChange: true,
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+
+    });
    
-    const addToCart = async(productId: string) => {
+    const existingCartItem = cartItems?.items?.find((item: any) => item.productId?._id === product._id)
+    const cartQuantity = existingCartItem ? existingCartItem?.quantity : 0;
+    const isOutOfStock = cartQuantity >= product?.stock;
+
+    const [cart] = useAddToCartMutation();
+    const navigate = useNavigate();
+
+
+    const addToCart = async (productId: string) => {
         let toastId: string | number | undefined; // Declare toastId here
         try {
-           toastId = toast.loading('Adding to cart...'); // Assign value inside try
+            toastId = toast.loading('Adding to cart...'); // Assign value inside try
             const res: any = await cart({ productId, quantity: 1 });
-            
-            if(res?.data?.success) {
+
+            if (res?.data?.success) {
                 toast.success('Product added to cart successfully!', { id: toastId });
-            } else if(res?.error) {
+            } else if (res?.error) {
                 toast.error(res.error.data.message || 'Failed to add product to cart', { id: toastId });
             }
         } catch (error) {
@@ -76,7 +90,7 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
             console.error('Add to cart error:', error);
         }
     }
-    
+
 
     const getStockStatusClasses = (stock: number) => {
         if (stock > 10) {
@@ -88,7 +102,7 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
         return 'text-red-600'; // Out of Stock
     };
 
-     const getStockStatusText = (stock: number) => {
+    const getStockStatusText = (stock: number) => {
         if (stock > 10) {
             return 'In Stock';
         }
@@ -118,23 +132,22 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const reviewCount = product.ratingsCount ?? 0; // Use ratingsCount, default to 0
 
     return (
-        <Link to='#' className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out group">
+        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out group">
             <div className="relative w-full pt-[75%] bg-gray-100"> {/* Aspect ratio container */}
                 <img
                     src={product.images?.[0]} // Use images[0] directly
                     alt={product.title} // Use title
                     className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                 />
+                />
                 {discountPercent && discountPercent > 0 && ( // Check if discount exists and is positive
                     <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
                         -{discountPercent}%
                     </span>
                 )}
-                 <button
+                <button
                     className="absolute top-2 right-2 bg-white/80 border border-gray-200 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer text-gray-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition duration-200 z-10"
                     aria-label="Add to wishlist"
-                    // onClick={handleAddToWishlist} // Add wishlist functionality
-                 >
+                >
                     <HeartIcon />
                 </button>
             </div>
@@ -145,22 +158,15 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     <span className="ml-1">({reviewCount} ratings)</span> {/* Use reviewCount */}
                 </div>
                 <h3 className="text-base font-semibold mb-2 hover:underline text-gray-800 line-clamp-2 min-h-[2.8em] group-hover:text-blue-600 transition-colors">
-                     {/* Link to product details page */}
-                   
-                       
-                        <Link to={`/product/${product._id}`}>
+                    <Link to={`/product/${product._id}`}>
                         <button className='text-blue-600 hover:text-blue-700 hover:underline cursor-pointer'> {product.title} </button>
-                        </Link>
-                    
+                    </Link>
+
                 </h3>
-                {/* Optional: Display Brand */}
-                {/* {product.brand && <p className="text-xs text-gray-500 mb-2">{product.brand}</p>}  */}
-                {/* <p className="text-sm text-gray-600 mb-3 flex-grow line-clamp-3 min-h-[4.05em]">
-                    {product.description}
-                </p> */}
+
                 <div className="mt-auto"> {/* Pushes price and stock down */}
                     <div className="flex items-baseline gap-2 mb-2">
-                         <span className={`text-lg font-bold ${discountPercent && discountPercent > 0 ? 'text-red-600' : 'text-gray-900'}`}> {/* Check discount */}
+                        <span className={`text-lg font-bold ${discountPercent && discountPercent > 0 ? 'text-red-600' : 'text-gray-900'}`}> {/* Check discount */}
                             ${product.finalPrice.toFixed(2)} {/* Use finalPrice */}
                         </span>
                         {discountPercent && discountPercent > 0 && product.price > product.finalPrice && ( // Check discount and prices
@@ -168,26 +174,31 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                                 ${product.price.toFixed(2)} {/* Use price as original */}
                             </span>
                         )}
-                     </div>
+                    </div>
                     <div className="flex items-center justify-between">
                         <span className={`text-sm font-medium ${stockStatusClasses}`}>
                             {stockStatusText}
                         </span>
-                      <button 
+                        <button
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200
-                                ${product.stock > 0 
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
-                                    : 'bg-gray-200 text-gray-500 cursor-not-allowed '}`}
-                            disabled={product.stock === 0}
+                               ${isOutOfStock
+                                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'}`}
+                            disabled={isOutOfStock}
                             onClick={() => user ? addToCart(product._id.toString()) : navigate('/login')}
                         >
                             <CartIcon />
-                            {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                         </button>
+
+
+
+
+
                     </div>
                 </div>
             </div>
-        </Link>
+        </div>
     );
 };
 
