@@ -1,14 +1,38 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useRegisterMutation } from '../../Redux/features/auth/authApi';
+import { toast } from 'sonner';
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
-  
-    const handleSubmit = (e: React.FormEvent) => {
+    const [register] = useRegisterMutation();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle registration logic here
+        const formData = new FormData(e.currentTarget as HTMLFormElement);
+        const data = {
+            name: formData.get('name') as string,
+            email: formData.get('email') as string,
+            password: formData.get('password') as string,
+            role: "user",
+            status: "in-progress",
+            isDeleted: false
+        };
+
+        try {
+            toast.loading("Registering...");
+            const res = await register(data).unwrap();
+            console.log(res);
+            toast.dismiss();
+            toast.success("Registration successful");
+            navigate("/login");
+        } catch (err: any) {
+            const errorMessage = err?.data?.message || "Failed to register";
+            toast.error(errorMessage as string);
+        }
     };
 
     return (
@@ -116,7 +140,7 @@ const Register = () => {
                     >
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out shadow-lg"
+                            className=" cursor-pointer group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out shadow-lg"
                         >
                             Create Account
                         </button>

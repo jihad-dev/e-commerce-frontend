@@ -2,16 +2,23 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../Redux/hooks';
 import { logout } from '../../Redux/features/auth/authSlice';
+import { useGetCartQuery } from '../../Redux/features/cart/cartApi';
 
 const Header = () => {
+  const user = useAppSelector((state) => state.auth.user);
+  const { data: cart} = useGetCartQuery(undefined,{
+    skip: !user,
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
+
+  const cartLength = cart?.items?.length ;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
-
-  const user = useAppSelector((state) => state.auth.user);
 
   const dispatch = useAppDispatch();
 
@@ -53,14 +60,19 @@ const Header = () => {
 
           {/* Cart & Account */}
           <div className="flex items-center space-x-4">
-            <a href="/cart" className="text-gray-600 hover:text-gray-900">
+            { user? <Link to="/cart" className="relative inline-flex items-center p-2 text-gray-600 hover:text-blue-600 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-            </a>
+             
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartLength || 0}
+                </span>
+              
+            </Link> : null}
             <div>
 
-             {!user? "" : <Link to='/profile' className="text-gray-600 hover:text-gray-900">
+              {!user ? "" : <Link to='/profile' className="text-gray-600 hover:text-gray-900">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -80,7 +92,7 @@ const Header = () => {
             {user ? (
               <>
                 <Link to="/login" onClick={() => dispatch(logout())} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Logout</Link>
-                
+
               </>
             ) : (
               <>
@@ -92,7 +104,7 @@ const Header = () => {
               <Link to="/orders" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">my order</Link>
             ) : (
               <>
-               
+
 
               </>
             )}

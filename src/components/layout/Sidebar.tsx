@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       children: [
         { to: '/dashboard/products', label: 'All Products' },
         { to: '/dashboard/products/add-product', label: 'Add Product' },
-        { to: '/dashboard/products/categories', label: 'Categories' },
+        
       ],
     },
     {

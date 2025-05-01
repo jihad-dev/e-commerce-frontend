@@ -20,23 +20,32 @@ const Login = () => {
             toastId = toast.loading('Logging in...');
             const email = (e.target as HTMLFormElement).email.value;
             const password = (e.target as HTMLFormElement).password.value;
+            
+            if (!email || !password) {
+                toast.error('Please fill in all fields', { id: toastId });
+                return;
+            }
+
             const userInfo = {
                 email,
                 password
             }
+
             const res = await login(userInfo).unwrap();
-            const user = await verifyToken(res?.data?.accessToken);
-            dispatch(setUser({ user: user, token: res?.data?.accessToken }));
+            
+            if (!res?.data?.accessToken) {
+                throw new Error('Invalid credentials');
+            }
+
+            const user = await verifyToken(res?.data?.accessToken || "");
+            dispatch(setUser({ user: user, token: res?.data?.accessToken || "" }));
             toast.success('Logged in successfully', { id: toastId });
             navigate('/');
-        } catch (error: any) {
-            if (!toastId) {
+
+            } catch (error: any) {
+                
                 toast.error(error?.data?.message || 'An unknown error occurred');
-            } else {
-                toast.error(error?.data?.message, { id: toastId });
             }
-        }   
-      
     };
 
 

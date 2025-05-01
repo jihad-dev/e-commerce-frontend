@@ -128,17 +128,21 @@ const AdminHome = () => {
           >
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-4">
-              <motion.button 
+         
+           <motion.button 
                 className="p-4 bg-gray-50 rounded-xl"
                 whileHover={{ scale: 1.05, backgroundColor: '#F3F4F6' }}
               >
-                <FiPackage className="w-6 h-6 mx-auto text-blue-600" />
-                <span className="block mt-2 text-sm">Add Product</span>
+                  <Link to={'/dashboard/products/add-product'}>
+                  <FiPackage className="w-6 h-6 mx-auto text-blue-600" />
+                  <span className="block mt-2 text-sm">Add Product</span>
+           </Link>
+              
               </motion.button>
               
               <Link to={'/dashboard/customers'}>
                 <motion.button 
-                  className="p-4 bg-gray-50 rounded-xl w-full"
+                  className="p-4 bg-gray-50 rounded-xl w-full cursor-pointer"
                   whileHover={{ scale: 1.05, backgroundColor: '#F3F4F6' }}
                 >
                   <FiUsers className="w-6 h-6 mx-auto text-purple-600" />

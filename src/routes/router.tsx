@@ -23,6 +23,8 @@ import AddProduct from "../Pages/AdminPage/AddProduct";
 import ViewProductFullDetails from "../Pages/AdminPage/ViewProductFullDetails";
 import AllCategories from "../Pages/AdminPage/AllCategories";
 import AddCategories from "../Pages/AdminPage/AddCategories";
+import Unauthorized from "../utils/Unauthorized";
+import ProductDetails from "../Pages/Products/ProductDetails";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -57,64 +59,65 @@ export const router = createBrowserRouter([
       {
         path: "/cart",
         element: <Cart />,
-      },
+      }
+      
     ],
   },
   {
     path: "/dashboard",
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={["admin"]}>
         <Dashboard/>
       </PrivateRoute>
     ),
     children: [
       {
         path:"/dashboard/admin-home",
-        element:<PrivateRoute><AdminHome/></PrivateRoute>
+        element:<PrivateRoute allowedRoles={["admin"]}><AdminHome/></PrivateRoute>
       },
       {
         path: "/dashboard/products",
-        element: <PrivateRoute><AllProducts/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><AllProducts/></PrivateRoute>
       },
       {
         path: "/dashboard/customers",
-        element: <PrivateRoute><Customers/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><Customers/></PrivateRoute>
       },
       {
         path: "/dashboard/customers/:id",
-        element: <PrivateRoute><ViewUserInfo/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><ViewUserInfo/></PrivateRoute>
       },
       {
         path: "/dashboard/customers/change-status/:id",
-        element: <PrivateRoute><ChangeStatus/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><ChangeStatus/></PrivateRoute>
       },
       {
         path: "/dashboard/All-admin",
-        element: <PrivateRoute><AllAdmin/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><AllAdmin/></PrivateRoute>
       },
       {
         path: "/dashboard/admin/create-admin",
-        element: <PrivateRoute><CreateAdmin/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><CreateAdmin/></PrivateRoute>
       },
       {
         path: "/dashboard/admin/admin-info/:id",
-        element: <PrivateRoute><ViewAdminInfo/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><ViewAdminInfo/></PrivateRoute>
       },
       {
         path: "/dashboard/products/add-product",
-        element: <PrivateRoute><AddProduct/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><AddProduct/></PrivateRoute>
       },
       {
         path: "/dashboard/products/view-product/:id",
-        element: <PrivateRoute><ViewProductFullDetails/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><ViewProductFullDetails/></PrivateRoute>
       },
       {
         path: "/dashboard/categories",
-        element: <PrivateRoute><AllCategories/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><AllCategories/></PrivateRoute>
       },
       {
         path: "/dashboard/categories/add-category",
-        element: <PrivateRoute><AddCategories/></PrivateRoute>
+        element: <PrivateRoute allowedRoles={["admin"]}><AddCategories/></PrivateRoute>
       },
 
       // {
@@ -153,6 +156,14 @@ export const router = createBrowserRouter([
       //   element: <AdminRoute><AdminHome></AdminHome></AdminRoute>
       // }
     ],
+  },
+  {
+    path: "/unauthorized",
+    element: <Unauthorized />,
+  },
+  {
+    path: "/product/:id",
+    element: <ProductDetails />,
   },
 ]);
 

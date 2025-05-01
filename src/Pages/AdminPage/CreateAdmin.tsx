@@ -1,26 +1,43 @@
 import { useCreateAdminMutation } from "../../Redux/features/admin/adminApi";
 import Loader from "../../utils/Loader";
+import { toast } from "sonner";
+
 const CreateAdmin = () => {
     const [createAdmin, { isLoading }] = useCreateAdminMutation();
+   
     if(isLoading){
-        return <Loader/>
+        return <div className="flex items-center justify-center min-h-screen">
+            <Loader/>
+        </div>
     }
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const form = e.target as HTMLFormElement;
-       
+      
+
+        const formData = new FormData(e.currentTarget);
+        
         const data = {
-            name: form.name.value,
-            email: form.email.value,
-            password: form.password.value,
+            name: formData.get('name') as string,
+            email: formData.get('email') as string,
+            password: formData.get('password') as string,
             role: "admin",
             status: "in-progress",
             isDeleted: false
-          };
-          
-        console.log(data);
-      const res = await createAdmin(data);
-      console.log(res);
+        };
+
+        try {
+            toast.loading("Creating admin...");
+
+            const res = await createAdmin(data).unwrap();
+            toast.success("Admin created successfully!");
+            // Reset form
+            (e.target as HTMLFormElement).reset();
+            toast.dismiss();
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Failed to create admin";
+            toast.error(errorMessage);
+        }
     };
 
     return (
@@ -33,7 +50,7 @@ const CreateAdmin = () => {
                         type="text"
                         id="name"
                         name="name"
-                        className="w-full px-3 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
@@ -43,7 +60,7 @@ const CreateAdmin = () => {
                         type="email"
                         id="email"
                         name="email"
-                        className="w-full px-3 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
@@ -53,13 +70,13 @@ const CreateAdmin = () => {
                         type="password"
                         id="password"
                         name="password"
-                        className="w-full px-3 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+                    className=" cursor-pointer w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                     Create Admin
                 </button>

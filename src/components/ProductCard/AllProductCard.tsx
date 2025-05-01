@@ -1,6 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../../Redux/hooks';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../Redux/hooks';
+import { useAddToCartMutation } from '../../Redux/features/cart/cartApi';
+import { toast } from 'sonner';
 // removed: import styles from './ProductCard.module.css';
 
 // Define the structure of a Product based on the provided JSON
@@ -54,12 +56,27 @@ const CartIcon = () => (
 );
 
 const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    const [cart, {isLoading}] = useAddToCartMutation();
     const navigate = useNavigate();
     const user = useAppSelector((state) => state.auth.user);
-    const addToCart = (productId: string) => {
-        console.log('Add to Cart button clicked',productId);
-        navigate('/cart');
+   
+    const addToCart = async(productId: string) => {
+        let toastId: string | number | undefined; // Declare toastId here
+        try {
+           toastId = toast.loading('Adding to cart...'); // Assign value inside try
+            const res: any = await cart({ productId, quantity: 1 });
+            
+            if(res?.data?.success) {
+                toast.success('Product added to cart successfully!', { id: toastId });
+            } else if(res?.error) {
+                toast.error(res.error.data.message || 'Failed to add product to cart', { id: toastId });
+            }
+        } catch (error) {
+            toast.error('Something went wrong! Please try again.', { id: toastId });
+            console.error('Add to cart error:', error);
+        }
     }
+    
 
     const getStockStatusClasses = (stock: number) => {
         if (stock > 10) {
@@ -101,7 +118,7 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const reviewCount = product.ratingsCount ?? 0; // Use ratingsCount, default to 0
 
     return (
-        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out group">
+        <Link to='#' className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out group">
             <div className="relative w-full pt-[75%] bg-gray-100"> {/* Aspect ratio container */}
                 <img
                     src={product.images?.[0]} // Use images[0] directly
@@ -127,11 +144,14 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     {rating > 0 && <span>{rating.toFixed(1)}</span>}
                     <span className="ml-1">({reviewCount} ratings)</span> {/* Use reviewCount */}
                 </div>
-                <h3 className="text-base font-semibold mb-2 text-gray-800 line-clamp-2 min-h-[2.8em] group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base font-semibold mb-2 hover:underline text-gray-800 line-clamp-2 min-h-[2.8em] group-hover:text-blue-600 transition-colors">
                      {/* Link to product details page */}
-                    <a href={`/product/${product._id}`} className="hover:underline">
-                        {product.title} {/* Use title */}
-                     </a>
+                   
+                       
+                        <Link to={`/product/${product._id}`}>
+                        <button className='text-blue-600 hover:text-blue-700 hover:underline cursor-pointer'> {product.title} </button>
+                        </Link>
+                    
                 </h3>
                 {/* Optional: Display Brand */}
                 {/* {product.brand && <p className="text-xs text-gray-500 mb-2">{product.brand}</p>}  */}
@@ -156,8 +176,8 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                       <button 
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200
                                 ${product.stock > 0 
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                                    : 'bg-gray-200 text-gray-500 cursor-not-allowed '}`}
                             disabled={product.stock === 0}
                             onClick={() => user ? addToCart(product._id.toString()) : navigate('/login')}
                         >
@@ -167,7 +187,7 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 };
 

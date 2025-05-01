@@ -3,13 +3,8 @@ import ProductCard from '../../../utils/ProductCard';
 import { useGetFeaturedProductsQuery } from '../../../Redux/features/products/productsApi';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Pagination } from 'swiper/modules';
-import { Link } from 'react-router-dom';
 import Loader from '../../../utils/Loader';
 
-// Import Swiper styles if not already imported globally
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/pagination';
 
 const FeaturedProducts = () => {
   // Include isLoading and isError states
@@ -17,7 +12,7 @@ const FeaturedProducts = () => {
   
   // Handle loading state
   if (isLoading) {
-    return <div className="py-12 flex justify-center"><Loader /></div>; 
+    return <Loader />
   }
 
   // Handle error state
@@ -61,7 +56,7 @@ const FeaturedProducts = () => {
           }}
           className="mySwiper pb-10" // Added padding-bottom for pagination dots
         >
-          {featuredData.map((product: any, index: number) => ( // Removed optional chaining as we check products existence above
+          {featuredData?.map((product: any, index: number) => ( // Removed optional chaining as we check products existence above
             <SwiperSlide key={index}>
               <motion.div
                 initial="hidden"

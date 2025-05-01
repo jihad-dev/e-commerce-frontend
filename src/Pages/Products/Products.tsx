@@ -3,6 +3,7 @@ import { useGetAllCategoriesQuery } from '../../Redux/features/categories/catego
 import { useGetAllProductsQuery } from '../../Redux/features/products/productsApi';
 import AllProductCard, { Product } from '../../components/ProductCard/AllProductCard';
 import Pagination from '../../components/Pagination/Pagination';
+import Loader from '../../utils/Loader';
 
 const SORT_OPTIONS = [
     'Best Rating',
@@ -42,7 +43,7 @@ const Products = () => {
 
         // Filter by price (use discountPrice if available, otherwise original price)
         result = result.filter((p) => {
-            const priceToCompare = p.discountPrice ?? p.price;
+            const priceToCompare = p.finalPrice ?? p.price;
             return priceToCompare >= priceRange.min && priceToCompare <= priceRange.max;
         });
 
@@ -132,7 +133,7 @@ const Products = () => {
 
     // --- Loading State --- //
     if (productsLoading) {
-        return <div className="flex justify-center items-center h-screen">Loading Products...</div>; // Replace with a proper spinner/skeleton
+        return <Loader />
     }
 
     return (
@@ -258,7 +259,7 @@ const Products = () => {
                     {/* Product Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                         {paginatedProducts.length > 0 ? (
-                            paginatedProducts.map((product, index) => (
+                            paginatedProducts.map((product: any, index: any) => (
                                 <AllProductCard key={product._id} product={product} />
                             ))
                         ) : (

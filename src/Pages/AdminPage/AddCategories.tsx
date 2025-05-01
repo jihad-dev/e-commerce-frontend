@@ -106,22 +106,19 @@ const AddCategories = () => {
 
         try {
             toastId = toast.loading('Adding category...');
-            const res = await addCategory(category).unwrap();
-            console.log(res);
+            await addCategory(category).unwrap();
             toast.success('Category added successfully!', { id: toastId });
             setCategory({
                 name: '',
                 image: ''
             });
         } catch (error) {
-            const errorMessage = error instanceof Error
-                ? error.message
-                : 'An unknown error occurred while adding the category';
+            const errorMessage = error?.data?.message || 'An unknown error occurred while adding the category';
             toast.error(errorMessage, {
                 id: toastId,
                 duration: 3000
             });
-            console.error('Error adding category:', error);
+           
         }
     };
 

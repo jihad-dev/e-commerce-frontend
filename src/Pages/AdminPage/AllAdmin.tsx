@@ -16,7 +16,7 @@ interface Admin {
 }
 
 const AllAdmin = () => {
-
+    const [searchTerm, setSearchTerm] = useState("");
     const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
     const { data: adminsData, isLoading } = useGetAllAdminsQuery(undefined, {
@@ -27,6 +27,11 @@ const AllAdmin = () => {
     const [deleteAdmin] = useDeleteAdminMutation();
 
     const admins = (adminsData as Admin[]) || [];
+    const filteredAdmins = admins.filter((admin) =>
+        admin.name.toLowerCase().includes(searchTerm) ||
+        admin.email.toLowerCase().includes(searchTerm)
+      );
+      
 
     // Handle window resize
     useEffect(() => {
@@ -37,9 +42,8 @@ const AllAdmin = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    if (isLoading) {
-        return <Loader />;
-    }
+    if (isLoading) return <Loader />;
+ 
     // delete admin
     const handleDelete = async (admin: Admin) => {
         Swal.fire({
@@ -137,7 +141,9 @@ const AllAdmin = () => {
                         <FiSearch className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
-                        type="text"
+                        type="search"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search by name or email..."
                         className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
@@ -151,7 +157,7 @@ const AllAdmin = () => {
                 animate="visible"
                 className="px-4 pb-4 space-y-3"
             >
-                {admins.map((admin: Admin) => (
+                { filteredAdmins && filteredAdmins.map((admin: Admin) => (
                     <motion.div
                         key={admin._id}
                         variants={itemVariants}
@@ -222,12 +228,15 @@ const AllAdmin = () => {
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <FiSearch className="h-5 w-5 text-gray-400" />
                             </div>
+                        
                             <input
-                                type="text"
-                                placeholder="Search by name, email or role..."
+                                type="search"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+                                placeholder="Search by name or email..."
                                 className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-
                             />
+
                         </div>
                     </div>
 
@@ -259,7 +268,7 @@ const AllAdmin = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         <AnimatePresence>
-                            {admins.map((admin: Admin) => (
+                            {filteredAdmins && filteredAdmins?.map((admin: Admin) => (
                                 <motion.tr
                                     key={admin._id}
                                     variants={itemVariants}
