@@ -2,9 +2,12 @@ import { Link } from "react-router-dom";
 import { useGetCartQuery, useUpdateCartItemMutation, useRemoveFromCartMutation } from "../../Redux/features/cart/cartApi";
 import Loader from "../../utils/Loader";
 import { toast } from "sonner";
+import { useAppSelector } from "../../Redux/hooks";
 
 const Cart = () => {
+    const user = useAppSelector((state) => state.auth.user);
     const { data: cart, isLoading } = useGetCartQuery(undefined, {
+        skip: !user,
         refetchOnMountOrArgChange: true,
         refetchOnFocus: true,
         refetchOnReconnect: true,

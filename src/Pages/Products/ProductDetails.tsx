@@ -42,7 +42,7 @@ const ProductDetails = () => {
         refetchOnFocus: true,
         refetchOnReconnect: true,
     });
-const existingCartItem = cartItems?.items?.find((item: any) => item.productId?._id === product._id)
+    const existingCartItem = cartItems?.items?.find((item: any) => item?.productId?._id === product?._id)
     const cartQuantity = existingCartItem ? existingCartItem?.quantity : 0;
     const isOutOfStock = cartQuantity >= product?.stock;
     const [selectedImage, setSelectedImage] = useState(0);
@@ -231,7 +231,7 @@ const existingCartItem = cartItems?.items?.find((item: any) => item.productId?._
                                 className={`flex-1 py-4 px-8 text-lg font-medium rounded-xl shadow-lg transition-all
                                     ${isOutOfStock
                                         ? 'bg-gray-300 cursor-not-allowed'
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'}`}
                             >
                                 {product?.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                             </motion.button>
@@ -239,7 +239,7 @@ const existingCartItem = cartItems?.items?.find((item: any) => item.productId?._
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="flex-1 py-4 px-8 text-lg font-medium bg-white border-2 border-gray-300 rounded-xl shadow-lg hover:bg-gray-50 transition-colors"
+                                className="flex-1 cursor-pointer py-4 px-8 text-lg font-medium bg-white border-2 border-gray-300 rounded-xl shadow-lg hover:bg-gray-50 transition-colors"
                             >
                                 Add to Wishlist
                             </motion.button>
