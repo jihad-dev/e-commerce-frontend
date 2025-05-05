@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { FiSearch, FiEye, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useGetAllAdminsQuery } from "../../Redux/features/auth/authApi";
 import Loader from "../../utils/Loader";
 import Swal from "sweetalert2";
-import { useDeleteAdminMutation } from "../../Redux/features/admin/adminApi";
+import { useDeleteAdminMutation, useGetAllAdminsQuery } from "../../Redux/features/admin/adminApi";
 interface Admin {
     _id: string;
     avatar?: string;

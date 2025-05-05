@@ -101,7 +101,7 @@ const Header = () => {
               </>
             )}
             {user?.role === "user" ? (
-              <Link to="/orders" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">my order</Link>
+              <Link to="/my-order" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">my order</Link>
             ) : (
               <>
 

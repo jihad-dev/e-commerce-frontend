@@ -8,12 +8,20 @@ const adminApi = baseApi.injectEndpoints({
          method: 'GET',
          providesTags: ['users']
       }),
+      getAllAdmins: builder.query({
+         query: () => ({
+            url: '/users/all-admin',
+            method: 'GET',
+         }),
+         providesTags: ['admins'],
+         transformResponse: (response: any) => response?.data,
+      }),
       changeStatus: builder.mutation({
-         query: (data:{id:string, status:string}) => ({
+         query: (data: { id: string, status: string }) => ({
             url: `/users/status/${data?.id}`,
             method: 'PATCH',
             body: {
-                status: data?.status
+               status: data?.status
             }
          }),
          invalidatesTags: ['users']
@@ -29,7 +37,7 @@ const adminApi = baseApi.injectEndpoints({
       }),
       //get single admin
       getSingleAdmin: builder.query({
-         query: (id:string) => ({
+         query: (id: string) => ({
             url: `/admins/${id}`,
             method: 'GET',
          }),
@@ -37,7 +45,7 @@ const adminApi = baseApi.injectEndpoints({
       }),
       //delete admin
       deleteAdmin: builder.mutation({
-         query: (id:string) => ({
+         query: (id: string) => ({
             url: `/admins/${id}`,
             method: 'DELETE',
          }),
@@ -45,14 +53,14 @@ const adminApi = baseApi.injectEndpoints({
       }),
       //delete user
       deleteUser: builder.mutation({
-         query: (id:string) => ({
+         query: (id: string) => ({
             url: `/users/${id}`,
             method: 'DELETE',
          }),
          invalidatesTags: ['users']
       })
-     
+
    }),
 })
 
-export const { useGetAllUsersQuery, useChangeStatusMutation, useCreateAdminMutation, useGetSingleAdminQuery , useDeleteAdminMutation, useDeleteUserMutation} = adminApi;
+export const { useGetAllUsersQuery, useChangeStatusMutation, useCreateAdminMutation, useGetSingleAdminQuery, useDeleteAdminMutation, useDeleteUserMutation, useGetAllAdminsQuery } = adminApi;

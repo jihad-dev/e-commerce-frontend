@@ -24,15 +24,8 @@ const authApi = baseApi.injectEndpoints({
             }),
             transformResponse: (response: any) => response?.data,
         }),
-        getAllAdmins: builder.query({
-            query: () => ({
-                url: '/admins',
-                method: 'GET',
-            }),
-            providesTags: ['admins'],
-            transformResponse: (response: any) => response?.data,
-        }),
+       
     }),
 })
 
-export const { useLoginMutation, useGetAllAdminsQuery, useGetSingleUserQuery, useRegisterMutation} = authApi;
+export const { useLoginMutation, useGetSingleUserQuery, useRegisterMutation} = authApi;

@@ -17,7 +17,6 @@ import ChangeStatus from "../Pages/AdminPage/ChangeStatus";
 import AllProducts from "../Pages/AdminPage/AllProducts";
 import AllAdmin from "../Pages/AdminPage/AllAdmin";
 import CreateAdmin from "../Pages/AdminPage/CreateAdmin";
-import ChangeUserRole from "../Pages/AdminPage/ChangeUserRole";
 import ViewAdminInfo from "../Pages/AdminPage/ViewAdminInfo";
 import AddProduct from "../Pages/AdminPage/AddProduct";
 import ViewProductFullDetails from "../Pages/AdminPage/ViewProductFullDetails";
@@ -26,6 +25,7 @@ import AddCategories from "../Pages/AdminPage/AddCategories";
 import Unauthorized from "../utils/Unauthorized";
 import ProductDetails from "../Pages/Products/ProductDetails";
 import Order from "../Pages/Order/Order";
+import MyOrder from "../Pages/My-order/My-order";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -169,6 +169,10 @@ export const router = createBrowserRouter([
   {
     path: "/order",
     element: <Order />,
+  },
+  {
+    path: "/my-order",
+    element: <MyOrder />,
   },
 ]);
 

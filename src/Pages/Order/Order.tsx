@@ -3,7 +3,7 @@ import { useGetCartQuery } from '../../Redux/features/cart/cartApi';
 import { useAppSelector } from '../../Redux/hooks';
 import { toast } from 'sonner';
 import Loader from '../../utils/Loader';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useCreateOrderMutation } from '../../Redux/features/order/orderApi';
 
 // Define the expected structure for cart items and the overall cart data
@@ -33,9 +33,23 @@ interface RtkError {
     };
 }
 
+// Define the expected structure for the successful response
+interface PaymentSession {
+    payment_url?: string; // Optional based on your API
+}
+
+interface CreateOrderSuccessResponse {
+    data?: {
+        paymentSession?: PaymentSession;
+        // Include other potential properties in the data object if relevant
+    };
+    // Include other top-level properties if relevant
+}
+
 const Order = () => {
     const [createOrder, { isLoading: isOrderLoading }] = useCreateOrderMutation();
     const user = useAppSelector((state) => state.auth.user);
+    const navigate = useNavigate();
     const location = useLocation();
     const totalPrice = location.state?.totalPrice;
     // Fetch data first
@@ -127,9 +141,6 @@ const Order = () => {
                 toast.error("No items to order.", { id: toastId });
                 return;
             }
-
-            console.log(user);
-
             const orderData = {
                 userId: user?.id,
                 phone: user?.phone,
@@ -145,10 +156,22 @@ const Order = () => {
                 toast.error("Please fill in all shipping information.", { id: toastId });
                 return;
             }
-            const res = await createOrder(orderData).unwrap();
-            selectedMethod === 'Cash on Delivery' ? toast.success("Order placed successfully!", { id: toastId }) : toast.success("go to payment page", { id: toastId });
-            if (selectedMethod !== 'Cash on Delivery') {
-                window.location.href = res?.data?.paymentSession?.payment_url;
+            const res = await createOrder(orderData).unwrap() as CreateOrderSuccessResponse;
+
+            if (selectedMethod === 'Cash on Delivery') {
+                toast.success("Order placed successfully!", { id: toastId });
+                navigate('/my-order');
+            } else {
+                // Check if the payment URL exists before redirecting
+                const paymentUrl = res?.data?.paymentSession?.payment_url;
+                if (paymentUrl) {
+                    toast.success("Redirecting to payment page...", { id: toastId });
+                    window.location.href = paymentUrl;
+                } else {
+                    // Handle cases where the payment URL is missing
+                    console.error("Payment URL not found in response:", res);
+                    toast.error("Could not initiate payment. Please try again or contact support.", { id: toastId });
+                }
             }
 
         } catch (error) {
