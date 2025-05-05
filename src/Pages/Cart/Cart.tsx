@@ -167,9 +167,11 @@ const Cart = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button className="w-full bg-blue-600 text-white py-3 rounded-lg mt-6 hover:bg-blue-700 transition-colors">
-                                Proceed to Checkout
-                            </button>
+                            <Link  to="/order" state={{ totalPrice:total.toFixed(2)}}>
+                                <button className="w-full cursor-pointer bg-blue-600 text-white py-3 rounded-lg mt-6 hover:bg-blue-700 transition-colors">
+                                    Proceed to Checkout
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

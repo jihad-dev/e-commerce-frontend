@@ -25,6 +25,7 @@ import AllCategories from "../Pages/AdminPage/AllCategories";
 import AddCategories from "../Pages/AdminPage/AddCategories";
 import Unauthorized from "../utils/Unauthorized";
 import ProductDetails from "../Pages/Products/ProductDetails";
+import Order from "../Pages/Order/Order";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -164,6 +165,10 @@ export const router = createBrowserRouter([
   {
     path: "/product/:id",
     element: <ProductDetails />,
+  },
+  {
+    path: "/order",
+    element: <Order />,
   },
 ]);
 
