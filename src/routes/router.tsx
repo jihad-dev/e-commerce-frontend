@@ -26,6 +26,9 @@ import Unauthorized from "../utils/Unauthorized";
 import ProductDetails from "../Pages/Products/ProductDetails";
 import Order from "../Pages/Order/Order";
 import MyOrder from "../Pages/My-order/My-order";
+import ViewAllOrders from "../Pages/AdminPage/ViewAllOrders";
+import About from "../Pages/About/About";
+import Contact from "../Pages/Contact/Contact";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -60,7 +63,16 @@ export const router = createBrowserRouter([
       {
         path: "/cart",
         element: <Cart />,
+      },
+      {
+        path: "/about",
+        element: <About />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
       }
+      
       
     ],
   },
@@ -121,41 +133,10 @@ export const router = createBrowserRouter([
         element: <PrivateRoute allowedRoles={["admin"]}><AddCategories/></PrivateRoute>
       },
 
-      // {
-      //   path: "/dashboard/payment",
-      //   element: <Payment></Payment>
-      // },
-      // {
-      //   path: '/dashboard/payment-history',
-      //   element: <PaymentHistory></PaymentHistory>,
-
-
-      // },
-      // // admin only routes //
-      // {
-      //   path: '/dashboard/all-users',
-      //   element: <AdminRoute><AllUsers></AllUsers></AdminRoute>
-      // },
-      // {
-      //   path: '/dashboard/add-items',
-      //   element: <AdminRoute><AddItems></AddItems></AdminRoute>
-      // },
-      // {
-      //   path: '/dashboard/manage-items',
-      //   element: <AdminRoute><ManageItems></ManageItems></AdminRoute>
-      // },
-      // {
-      //   path: '/dashboard/updateItem/:id',
-      //   element: <AdminRoute><UpdateItem></UpdateItem></AdminRoute>,
-      //   loader: async ({ params }) => {
-      //     return fetch(`https://bistroo-boss-server.vercel.app/menu/${params.id}`)
-      //   }
-
-      // },
-      // {
-      //   path: '/dashboard/admin-home',
-      //   element: <AdminRoute><AdminHome></AdminHome></AdminRoute>
-      // }
+      {
+        path: "/dashboard/orders",
+        element: <PrivateRoute allowedRoles={["admin"]}><ViewAllOrders/></PrivateRoute>
+      }
     ],
   },
   {

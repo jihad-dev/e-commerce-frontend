@@ -185,10 +185,10 @@ const ProductDetails = () => {
                         </div>
 
                         <div className="flex items-baseline gap-4 mb-8">
-                            <h2 className="text-4xl font-bold text-gray-900">${product?.finalPrice?.toFixed(2)}</h2>
+                            <h2 className="text-4xl font-bold text-gray-900">৳{product?.finalPrice?.toFixed(2)}</h2>
                             {product?.discount > 0 && (
                                 <>
-                                    <span className="text-xl text-gray-500 line-through">${product?.price?.toFixed(2)}</span>
+                                    <span className="text-xl text-gray-500 line-through">৳{product?.price?.toFixed(2)}</span>
                                     <span className="text-lg font-medium text-red-600">Save {product?.discount}%</span>
                                 </>
                             )}
@@ -216,7 +216,7 @@ const ProductDetails = () => {
                                 {product?.shipping > 0 && (
                                     <div className="bg-white p-4 rounded-xl shadow-sm">
                                         <h4 className="text-sm text-gray-500 uppercase mb-2">Shipping</h4>
-                                        <p className="font-medium">${product?.shipping}</p>
+                                        <p className="font-medium">৳{product?.shipping}</p>
                                     </div>
                                 )}
                             </div>

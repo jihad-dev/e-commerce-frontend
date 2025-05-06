@@ -5,6 +5,10 @@ import AllProductCard, { Product } from '../../components/ProductCard/AllProduct
 import Pagination from '../../components/Pagination/Pagination';
 import Loader from '../../utils/Loader';
 
+// Define or import Category type if possible
+// For now, using 'any' as a placeholder, replace with actual type if available
+type Category = any;
+
 const SORT_OPTIONS = [
     'Best Rating',
     'Price: Low to High',
@@ -17,11 +21,11 @@ const PRODUCTS_PER_PAGE = 9;
 // --- Component ---
 const Products = () => {
    
-    const { data: categories } = useGetAllCategoriesQuery(undefined);
-    const { data: products, isLoading: productsLoading } = useGetAllProductsQuery(undefined);
-    // Extract the arrays, providing default empty arrays if data is null/undefined
-    const CATEGORIES = categories ?? [];
-    const ALL_PRODUCTS: Product[] = products ?? [];
+    const { data: categoriesData } = useGetAllCategoriesQuery(undefined);
+    const { data: productsData, isLoading: productsLoading } = useGetAllProductsQuery(undefined);
+    // Explicitly type the arrays, providing default empty arrays if data is null/undefined
+    const CATEGORIES: Category[] = Array.isArray(categoriesData) ? categoriesData : [];
+    const ALL_PRODUCTS: Product[] = Array.isArray(productsData) ? productsData : [];
 
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [priceRange, setPriceRange] = useState({ min: 0, max: 2000 }); // Initial max might need adjustment
@@ -56,10 +60,10 @@ const Products = () => {
 
         switch (sortBy) {
             case 'Price: Low to High':
-                result.sort((a, b) => (a.discountPrice ?? a.price) - (b.discountPrice ?? b.price));
+                result.sort((a: any, b: any) => (a.discountPrice ?? a.price) - (b.discountPrice ?? b.price));
                 break;
             case 'Price: High to Low':
-                result.sort((a, b) => (b.discountPrice ?? b.price) - (a.discountPrice ?? a.price));
+                result.sort((a: any, b: any) => (b.discountPrice ?? b.price) - (a.discountPrice ?? a.price));
                 break;
             case 'Newest Arrivals':
                 // Assuming presence of a createdAt field, otherwise sort by ID
@@ -172,6 +176,7 @@ const Products = () => {
                                                 className="cursor-pointer accent-blue-600 w-4 h-4"
                                             />
                                             {category?.name}
+                                            
                                         </label>
                                     </li>
                                 ))}
@@ -182,8 +187,8 @@ const Products = () => {
                         <div>
                             <h3 className="text-lg font-semibold mb-4 text-gray-800">Price Range</h3>
                             <div className="flex justify-between items-center mb-3 text-sm text-gray-600">
-                                <span>${currentMin}</span>
-                                <span>${currentMax}</span>
+                                <span>৳{currentMin}</span>
+                                <span>৳{currentMax}</span>
                             </div>
                             {/* Simple dual range slider placeholder - Use a library for a proper one */}
                             <div className="relative h-2 bg-gray-200 rounded-full mb-4">
@@ -259,7 +264,7 @@ const Products = () => {
                     {/* Product Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                         {paginatedProducts.length > 0 ? (
-                            paginatedProducts.map((product: any, index: any) => (
+                            paginatedProducts.map((product: any) => (
                                 <AllProductCard key={product._id} product={product} />
                             ))
                         ) : (

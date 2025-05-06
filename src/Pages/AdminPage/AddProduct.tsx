@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useAddProductMutation } from "../../Redux/features/products/productsApi";
 import { toast } from "sonner";
+import { useGetAllCategoriesQuery } from "../../Redux/features/categories/categoryApi";
+import { useAppSelector } from "../../Redux/hooks";
 
 // Define an interface for the product state
 interface ProductState {
@@ -8,7 +10,6 @@ interface ProductState {
   description: string;
   price: number;
   discount: number;
-  finalPrice: number;
   type: string;
   brand: string;
   stock: number;
@@ -32,12 +33,11 @@ const AddProductForm = () => {
     description: "",
     price: 0,
     discount: 0,
-    finalPrice: 0,
     type: "",
     brand: "",
     stock: 0,
     quantity: 1,
-    images: [""], 
+    images: [""],
     tags: [], // Now correctly typed as string[]
     category: "",
     ratings: 0,
@@ -48,9 +48,20 @@ const AddProductForm = () => {
     seller: "",
     isDeleted: false,
   });
+
+
   const [isUploading, setIsUploading] = useState(false);
-  const [addProduct,  {isLoading} ] = useAddProductMutation();
-  
+  const [addProduct, { isLoading }] = useAddProductMutation();
+  const { data: categories } = useGetAllCategoriesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  }) as {
+    data?: any[];
+    isLoading: boolean;
+    isError: boolean;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
@@ -63,18 +74,18 @@ const AddProductForm = () => {
   const handleImageChange = (index: number, value: string) => {
     const newImages = [...product.images];
     newImages[index] = value;
-    const updatedImages = newImages.filter((img, i) => i !== index || img !== ""); 
+    const updatedImages = newImages.filter((img, i) => i !== index || img !== "");
     setProduct((prev) => ({
       ...prev,
       images: updatedImages.length > 0 ? updatedImages : [""],
     }));
   };
-  
+
   const removeImageField = (index: number) => {
     const newImages = product.images.filter((_, i) => i !== index);
     setProduct((prev) => ({
       ...prev,
-      images: newImages.length > 0 ? newImages : [""], 
+      images: newImages.length > 0 ? newImages : [""],
     }));
   };
 
@@ -92,9 +103,9 @@ const AddProductForm = () => {
     const formData = new FormData();
     formData.append("file", file);
     const uploadPreset = "image_upload";
-    formData.append("upload_preset", uploadPreset); 
+    formData.append("upload_preset", uploadPreset);
     const cloudName = "drvenvkge";
-    const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`; 
+    const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
     try {
       const response = await fetch(CLOUDINARY_URL, {
@@ -119,43 +130,61 @@ const AddProductForm = () => {
     e.preventDefault();
     const validImages = product.images.filter(img => img && img.trim() !== '');
     if (validImages.length === 0) {
-        alert("Please upload at least one product image.");
-        return;
+      alert("Please upload at least one product image.");
+      return;
     }
 
     const data = {
-        title: product.title,
-        description: product.description,
-        price: Number(product.price) || 0,
-        discount: Number(product.discount) || 0,
-        finalPrice: Number(product.finalPrice) || 0,
-        type: product.type,
-        brand: product.brand,
-        stock: Number(product.stock) || 0,
-        quantity: Number(product.quantity) || 1,
-        images: validImages,
-        tags: product.tags.map((tag) => tag.trim()).filter(tag => tag),
-        category: product.category,
-        ratings: Number(product.ratings) || 0,
-        ratingsCount: Number(product.ratingsCount) || 0,
-        isFeatured: product.isFeatured,
-        status: product.status,
-        shipping: Number(product.shipping) || 0,
-        seller: product.seller,
-        isDeleted: product.isDeleted,
+      title: product.title,
+      description: product.description,
+      price: Number(product.price),
+      discount: Number(product.discount),
+      type: product.type,
+      brand: product.brand,
+      stock: Number(product.stock),
+      quantity: Number(product.quantity),
+      images: validImages,
+      tags: product.tags.map((tag) => tag.trim()).filter(tag => tag),
+      category: product.category,
+      ratings: Number(product.ratings),
+      ratingsCount: Number(product.ratingsCount),
+      isFeatured: product.isFeatured,
+      status: product.status,
+      shipping: Number(product.shipping),
+      seller: product.seller,
+      isDeleted: product.isDeleted,
     };
 
     let toastId: string | number | undefined;
     try {
-        toastId = toast.loading("Adding product...");
-        const res = await addProduct(data).unwrap();
-        toast.success("Product added successfully!", {id: toastId});
+      toastId = toast.loading("Adding product...");
+      await addProduct(data).unwrap();
+      toast.success("Product added successfully!", { id: toastId });
+      // Reset the form
+      setProduct({
+        title: "",
+        description: "",
+        price: 0,
+        discount: 0,
+        type: "",
+        brand: "",
+        stock: 0,
+        quantity: 1,
+        images: [""],
+        tags: [], // Now correctly typed as string[]
+        category: "",
+        ratings: 0,
+        ratingsCount: 0,
+        isFeatured: false,
+        status: "active",
+        shipping: 0,
+        seller: "",
+        isDeleted: false,
+      })
+
     } catch (err: any) {
-        if (toastId) {
-           toast.error("Failed to add product!", {id: toastId});
-        } else {
-           toast.error("Failed to add product!");
-        }
+      console.log(err);
+      toast.error("Failed to add product!", { id: toastId });
     }
   };
 
@@ -165,49 +194,54 @@ const AddProductForm = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Title</label>
-                <input required name="title" value={product.title} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Brand</label>
-                <input name="brand" value={product.brand} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Category</label>
-                <input required name="category" value={product.category} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Type (e.g., Electronics, Clothing)</label>
-                <input name="type" value={product.type} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Seller Name</label>
-                <input name="seller" value={product.seller} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Title</label>
+            <input required name="title" value={product.title} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Brand</label>
+            <input name="brand" value={product.brand} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Category</label>
+            <select name="category" id="category" onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+              {
+                categories && categories?.map((category: any) => (
+                  <option value={category.name}>{category.name}</option>
+                ))
+              }
+
+            </select>
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Type (e.g., Electronics, Clothing)</label>
+            <input name="type" value={product.type} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Seller Name</label>
+            <input name="seller" value={product.seller} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
         </div>
 
         <div className="space-y-4">
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Price ($)</label>
-                <input required type="number" min="0" step="0.01" name="price" value={product.price} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Discount (%)</label>
-                <input type="number" min="0" max="100" name="discount" value={product.discount} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-             <div>
-                <label className="block mb-1 font-medium text-gray-700">Final Price ($)</label>
-                <input type="number" min="0" step="0.01" name="finalPrice" value={product.finalPrice} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-            <div>
-                <label className="block mb-1 font-medium text-gray-700">Stock Quantity</label>
-                <input required type="number" min="0" name="stock" value={product.stock} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
-             <div>
-                <label className="block mb-1 font-medium text-gray-700">Shipping Cost ($)</label>
-                <input type="number" min="0" step="0.01" name="shipping" value={product.shipping} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Price (৳)</label>
+            <input required type="number" min="0" step="0.01" name="price" value={product.price || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Discount (%)</label>
+            <input type="number" min="0" max="100" name="discount" value={product.discount || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Stock Quantity</label>
+            <input required type="number" min="0" name="stock" value={product.stock || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Shipping Cost (৳)</label>
+            <input type="number" min="0" name="shipping" value={product.shipping || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
         </div>
       </div>
 
@@ -223,68 +257,68 @@ const AddProductForm = () => {
             <div key={index} className="relative group">
               <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors">
                 {url ? (
-                  <img 
-                    src={url} 
+                  <img
+                    src={url}
                     alt={`Product ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="text-center p-2">
-                     {isUploading ? (
-                       <div className="text-sm text-blue-600">Uploading...</div>
-                     ) : (
-                       <>
-                         <div className="text-blue-500 text-2xl mb-1">+</div>
-                         <div className="text-xs text-gray-500">Add Image</div>
-                       </>
-                     )}
+                    {isUploading ? (
+                      <div className="text-sm text-blue-600">Uploading...</div>
+                    ) : (
+                      <>
+                        <div className="text-blue-500 text-2xl mb-1">+</div>
+                        <div className="text-xs text-gray-500">Add Image</div>
+                      </>
+                    )}
                   </div>
                 )}
                 {!isUploading && (
-                    <input
+                  <input
                     type="file"
                     accept="image/png, image/jpeg, image/jpg, image/webp"
                     disabled={isUploading}
                     onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                        if (file.size > 5 * 1024 * 1024) { 
-                            alert("File is too large. Max size is 5MB.");
-                            e.target.value = '';
-                            return;
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert("File is too large. Max size is 5MB.");
+                          e.target.value = '';
+                          return;
                         }
                         try {
-                            const imageUrl = await uploadImage(file);
-                            if (imageUrl) {
+                          const imageUrl = await uploadImage(file);
+                          if (imageUrl) {
                             handleImageChange(index, imageUrl);
                             console.log("Image uploaded and URL saved:", imageUrl);
-                            }
+                          }
                         } catch (uploadError) {
-                            e.target.value = ''; 
+                          e.target.value = '';
                         }
-                        }
-                       if (!file && e.target) e.target.value = ''; 
+                      }
+                      if (!file && e.target) e.target.value = '';
                     }}
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                     title="Click to upload an image"
-                    />
+                  />
                 )}
               </div>
               {url && (product.images.length > 1 || product.images[0] !== "") && (
-                 <button
-                   type="button"
-                   onClick={() => removeImageField(index)}
-                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                   title="Remove image"
-                 >
-                   ✕
-                 </button>
-               )}
+                <button
+                  type="button"
+                  onClick={() => removeImageField(index)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove image"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
           {product.images[product.images.length - 1] !== "" && (
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={addMoreImageField}
               disabled={isUploading}
               className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -293,7 +327,7 @@ const AddProductForm = () => {
             </button>
           )}
         </div>
-         {isUploading && <div className="mt-2 text-sm text-blue-600">Uploading image, please wait...</div>}
+        {isUploading && <div className="mt-2 text-sm text-blue-600">Uploading image, please wait...</div>}
       </div>
 
       <div>
@@ -308,42 +342,42 @@ const AddProductForm = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">Ratings (Optional)</label>
-            <input type="number" min="0" max="5" step="0.1" name="ratings" value={product.ratings} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">Ratings Count (Optional)</label>
-            <input type="number" min="0" name="ratingsCount" value={product.ratingsCount} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-           <div>
-            <label className="block mb-1 font-medium text-gray-700">Status</label>
-            <select name="status" value={product.status} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-           </div>
+        <div>
+          <label className="block mb-1 font-medium text-gray-700">Ratings*</label>
+          <input type="number" min="0" max="5" step="0.1" name="ratings" value={product.ratings || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium text-gray-700">Ratings Count</label>
+          <input type="number" min="0" name="ratingsCount" value={product.ratingsCount || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium text-gray-700">Status</label>
+          <select name="status" value={product.status} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex items-center space-x-2 mt-4">
-        <input 
-            type="checkbox" 
-            id="isFeatured" 
-            name="isFeatured" 
-            checked={product.isFeatured} 
-            onChange={handleChange} 
-            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        <input
+          type="checkbox"
+          id="isFeatured"
+          name="isFeatured"
+          checked={product.isFeatured}
+          onChange={handleChange}
+          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
         />
         <label htmlFor="isFeatured" className="font-medium text-gray-700">Mark as Featured Product</label>
       </div>
 
       <div className="pt-4 text-center">
-        <button 
-            type="submit" 
-            disabled={isLoading || isUploading}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        <button
+          type="submit"
+          disabled={isLoading || isUploading}
+          className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-            {isLoading ? 'Adding Product...' : isUploading ? 'Uploading Image...' : 'Add Product'}
+          {isLoading ? 'Adding Product...' : isUploading ? 'Uploading Image...' : 'Add Product'}
         </button>
       </div>
     </form>

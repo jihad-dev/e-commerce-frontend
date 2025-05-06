@@ -51,7 +51,7 @@ const ProductCard: React.FC<{ product: Product, index: number }> = ({ product, i
             animate="visible"
             custom={index}
             whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.1)" }}
-            className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative group cursor-pointer"
+            className="bg-white  rounded-lg shadow-md overflow-hidden flex flex-col relative group cursor-pointer"
         >
             <div className="relative pb-[66.66%]"> {/* Aspect ratio container for image */}
                 <img
@@ -72,7 +72,7 @@ const ProductCard: React.FC<{ product: Product, index: number }> = ({ product, i
                 </div>
                 <p className="text-sm text-gray-600 mb-3 flex-grow line-clamp-2">{product?.description}</p>
                 <div className="flex items-end justify-between mt-auto">
-                    <p className="text-xl font-bold text-gray-900">${product?.price.toFixed(2)}</p>
+                    <p className="text-xl font-bold text-gray-900">৳{product?.price.toFixed(2)}</p>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}

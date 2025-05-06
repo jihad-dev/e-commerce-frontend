@@ -3,12 +3,18 @@ import { FiUsers, FiShoppingBag, FiDollarSign, FiPackage, FiActivity } from 'rea
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useGetAllUsersQuery } from '../../Redux/features/admin/adminApi';
+import { useGetAllOrdersQuery } from '../../Redux/features/order/orderApi';
 const AdminHome = () => {
   const { data: users } = useGetAllUsersQuery(undefined, {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
     refetchOnReconnect: true,
-  });
+  }) as { data: { data: { _id: string }[] } };
+  const { data: orders } = useGetAllOrdersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  }) as any;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -78,7 +84,7 @@ const AdminHome = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-500">Total Revenue</p>
-                <h3 className="text-2xl font-bold">$24,567</h3>
+                <h3 className="text-2xl font-bold">৳24,567</h3>
                 <p className="text-xs text-green-600">+12% from last month</p>
               </div>
             </div>
@@ -112,8 +118,8 @@ const AdminHome = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-500">Total Orders</p>
-                <h3 className="text-2xl font-bold">856</h3>
-                <p className="text-xs text-green-600">+15% from last month</p>
+                  <h3 className="text-2xl font-bold">{orders?.data?.length}</h3>
+                  <p className="text-xs text-green-600">+15% from last month</p>
               </div>
             </div>
           </motion.div>

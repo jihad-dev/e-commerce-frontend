@@ -29,8 +29,8 @@ const AllAdmin = () => {
     const filteredAdmins = admins.filter((admin) =>
         admin.name.toLowerCase().includes(searchTerm) ||
         admin.email.toLowerCase().includes(searchTerm)
-      );
-      
+    );
+
 
     // Handle window resize
     useEffect(() => {
@@ -42,7 +42,7 @@ const AllAdmin = () => {
     }, []);
 
     if (isLoading) return <Loader />;
- 
+
     // delete admin
     const handleDelete = async (admin: Admin) => {
         Swal.fire({
@@ -156,7 +156,7 @@ const AllAdmin = () => {
                 animate="visible"
                 className="px-4 pb-4 space-y-3"
             >
-                { filteredAdmins && filteredAdmins.map((admin: Admin) => (
+                {filteredAdmins && filteredAdmins.map((admin: Admin) => (
                     <motion.div
                         key={admin._id}
                         variants={itemVariants}
@@ -227,7 +227,7 @@ const AllAdmin = () => {
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <FiSearch className="h-5 w-5 text-gray-400" />
                             </div>
-                        
+
                             <input
                                 type="search"
                                 value={searchTerm}
@@ -241,7 +241,7 @@ const AllAdmin = () => {
 
                     <Link to="/dashboard/admin/create-admin">
                         <button className="inline-flex items-center px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                            <span className="mr-2">Add New Admin</span>
+                            <span className="mr-2 cursor-pointer">Add New Admin</span>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
@@ -275,11 +275,20 @@ const AllAdmin = () => {
                                 >
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <img
-                                                className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-                                                src={admin.avatar || "https://via.placeholder.com/40"}
-                                                alt={admin.name}
-                                            />
+                                            <svg
+                                                className="h-12 w-12 rounded-full bg-gray-200 p-2 text-gray-600"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round" 
+                                                    strokeWidth={2}
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                />
+                                            </svg>
                                             <div className="ml-4">
                                                 <div className="text-sm font-semibold text-gray-900">{admin.name}</div>
                                                 <div className="text-sm text-gray-500">{admin.email}</div>

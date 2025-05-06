@@ -1,7 +1,8 @@
 import { baseApi } from "../../api/baseApi";
+import { IUser } from "../../../types/user.types";
 
 const authApi = baseApi.injectEndpoints({
-    endpoints: (builder: any) => ({
+    endpoints: (builder) => ({
         login: builder.mutation({
             query: (userInfo: any) => ({
                 url: '/auth/login',
@@ -17,12 +18,12 @@ const authApi = baseApi.injectEndpoints({
                 body: userInfo,
             }),
         }),
-        getSingleUser: builder.query({
+        getSingleUser: builder.query<IUser, string>({
             query: (id: string) => ({
                 url: `/users/${id}`,
                 method: 'GET',
             }),
-            transformResponse: (response: any) => response?.data,
+            transformResponse: (response: any) => response.data,
         }),
        
     }),

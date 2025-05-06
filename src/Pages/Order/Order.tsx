@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { useGetCartQuery } from '../../Redux/features/cart/cartApi';
+import { useClearCartMutation, useGetCartQuery } from '../../Redux/features/cart/cartApi';
 import { useAppSelector } from '../../Redux/hooks';
 import { toast } from 'sonner';
 import Loader from '../../utils/Loader';
@@ -48,6 +48,8 @@ interface CreateOrderSuccessResponse {
 
 const Order = () => {
     const [createOrder, { isLoading: isOrderLoading }] = useCreateOrderMutation();
+    const [isRedirecting, setIsRedirecting] = useState(false);
+    const [clearCart] = useClearCartMutation();
     const user = useAppSelector((state) => state.auth.user);
     const navigate = useNavigate();
     const location = useLocation();
@@ -160,19 +162,29 @@ const Order = () => {
 
             if (selectedMethod === 'Cash on Delivery') {
                 toast.success("Order placed successfully!", { id: toastId });
+                clearCart({});
                 navigate('/my-order');
             } else {
                 // Check if the payment URL exists before redirecting
                 const paymentUrl = res?.data?.paymentSession?.payment_url;
+                
+
                 if (paymentUrl) {
                     toast.success("Redirecting to payment page...", { id: toastId });
-                    window.location.href = paymentUrl;
+                    setIsRedirecting(true);
+
+                    setTimeout(() => {
+                        clearCart({});
+                        window.location.href = paymentUrl;
+
+                    }, 1000);
                 } else {
                     // Handle cases where the payment URL is missing
                     console.error("Payment URL not found in response:", res);
                     toast.error("Could not initiate payment. Please try again or contact support.", { id: toastId });
                 }
             }
+
 
         } catch (error) {
             console.error("Failed to create order:", error); // Log the detailed error for debugging
@@ -199,7 +211,7 @@ const Order = () => {
 
     if (isLoading) return <Loader />;
 
-    if (!cart?.items?.length) {
+    if (!isRedirecting && !cart?.items?.length) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -233,13 +245,13 @@ const Order = () => {
                                         <p className="text-gray-500">Quantity: {item.quantity}</p>
                                     </div>
                                 </div>
-                                <p className="font-semibold">${(item.productId.price * item.quantity).toFixed(2)}</p>
+                                <p className="font-semibold">৳{(item.productId.price * item.quantity).toFixed(2)}</p>
                             </div>
                         ))}
                         <div className="border-t pt-4 mt-4">
                             <div className="flex justify-between font-semibold text-lg">
                                 <span>Total</span>
-                                <span>${totalPrice}</span>
+                                <span>৳{totalPrice}</span>
                             </div>
                         </div>
                     </div>

@@ -29,7 +29,7 @@ const adminApi = baseApi.injectEndpoints({
       //create admin
       createAdmin: builder.mutation({
          query: (data: any) => ({
-            url: '/admins/create-admin',
+            url: '/users/create-user',
             method: 'POST',
             body: data
          }),
@@ -38,7 +38,7 @@ const adminApi = baseApi.injectEndpoints({
       //get single admin
       getSingleAdmin: builder.query({
          query: (id: string) => ({
-            url: `/admins/${id}`,
+            url: `/users/admin/${id}`,
             method: 'GET',
          }),
          providesTags: ['admins']
@@ -46,7 +46,7 @@ const adminApi = baseApi.injectEndpoints({
       //delete admin
       deleteAdmin: builder.mutation({
          query: (id: string) => ({
-            url: `/admins/${id}`,
+            url: `/users/admin/${id}`,
             method: 'DELETE',
          }),
          invalidatesTags: ['admins']
@@ -60,7 +60,7 @@ const adminApi = baseApi.injectEndpoints({
          invalidatesTags: ['users']
       })
 
-   }),
+   })
 })
 
 export const { useGetAllUsersQuery, useChangeStatusMutation, useCreateAdminMutation, useGetSingleAdminQuery, useDeleteAdminMutation, useDeleteUserMutation, useGetAllAdminsQuery } = adminApi;

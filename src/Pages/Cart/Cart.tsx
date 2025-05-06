@@ -31,7 +31,7 @@ const Cart = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Your Cart is Empty</h1>
+                    <h1 className="text-3xl sm:text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Your Cart is Empty!!!</h1>
                     <p className="text-gray-600 text-lg sm:text-xl mb-10">Looks like you haven't added anything to your cart yet.</p>
                     <Link
                         to="/products"
@@ -69,8 +69,9 @@ const Cart = () => {
         }
     };
 
-
-    const subtotal = cartItems.reduce((acc: number, item: any) => acc + (item?.productId?.price * item?.quantity), 0);
+    
+    const subtotal = cartItems.reduce((acc: number, item: any) => acc + (item?.productId?.finalPrice * item?.quantity), 0);
+    console.log(subtotal);
     const shipping = 15.99;
     const tax = subtotal * 0.1; // 10% tax
     const total = subtotal + shipping + tax;
@@ -126,7 +127,7 @@ const Cart = () => {
 
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <p className="font-semibold">${(item?.productId?.price * item?.quantity).toFixed(2)}</p>
+                                                <p className="font-semibold">৳{(item?.productId?.finalPrice * item?.quantity).toFixed(2)}</p>
                                                 <button
                                                     className="text-red-500 hover:text-red-700 transition-colors duration-200 cursor-pointer"
                                                     onClick={() => handleRemoveItem(item?.productId?._id)}
@@ -150,20 +151,20 @@ const Cart = () => {
                             <div className="space-y-3">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>${subtotal.toFixed(2)}</span>
+                                    <span>৳{subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Shipping</span>
-                                    <span>${shipping.toFixed(2)}</span>
+                                    <span>৳{shipping.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Tax</span>
-                                    <span>${tax.toFixed(2)}</span>
+                                    <span>৳{tax.toFixed(2)}</span>
                                 </div>
                                 <div className="border-t pt-3">
                                     <div className="flex justify-between font-semibold">
                                         <span>Total</span>
-                                        <span>${total.toFixed(2)}</span>
+                                        <span>৳{total.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>

@@ -1,15 +1,23 @@
 import { motion } from 'framer-motion';
-import ProductCard from '../../../utils/ProductCard';
 import { useGetFeaturedProductsQuery } from '../../../Redux/features/products/productsApi';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Pagination } from 'swiper/modules';
+import { Autoplay, FreeMode, Pagination } from 'swiper/modules';
 import Loader from '../../../utils/Loader';
+import AllProductCard from '../../../components/ProductCard/AllProductCard';
 
 
 const FeaturedProducts = () => {
   // Include isLoading and isError states
-  const { data: featuredData, isLoading, isError } = useGetFeaturedProductsQuery(undefined);
-  
+  const {
+    data: featuredData = [],
+    isLoading,
+    isError
+  } = useGetFeaturedProductsQuery(undefined) as {
+    data?: any[];
+    isLoading: boolean;
+    isError: boolean;
+  };
+
   // Handle loading state
   if (isLoading) {
     return <Loader />
@@ -36,10 +44,15 @@ const FeaturedProducts = () => {
           slidesPerView={1} // Default slides per view
           spaceBetween={30}
           freeMode={true}
+          style={{ padding: '20px' }}
+          autoplay={{
+            delay: 2500,
+            disableOnInteraction: false,
+          }}
           pagination={{
             clickable: true,
           }}
-          modules={[FreeMode, Pagination]}
+          modules={[FreeMode, Pagination, Autoplay]}
           breakpoints={{
             // when window width is >= 640px
             640: {
@@ -47,7 +60,7 @@ const FeaturedProducts = () => {
             },
             // when window width is >= 768px (added for medium screens)
             768: {
-                slidesPerView: 3,
+              slidesPerView: 3,
             },
             // when window width is >= 1024px
             1024: {
@@ -56,7 +69,7 @@ const FeaturedProducts = () => {
           }}
           className="mySwiper pb-10" // Added padding-bottom for pagination dots
         >
-          {featuredData?.map((product: any, index: number) => ( // Removed optional chaining as we check products existence above
+          {featuredData && featuredData?.map((product: any, index: number) => ( // Removed optional chaining as we check products existence above
             <SwiperSlide key={index}>
               <motion.div
                 initial="hidden"
@@ -65,7 +78,7 @@ const FeaturedProducts = () => {
                 whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.1)" }}
                 className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full relative group"
               >
-                <ProductCard product={product} index={index} />
+                 <AllProductCard key={product._id} product={product} />
               </motion.div>
             </SwiperSlide>
           ))}

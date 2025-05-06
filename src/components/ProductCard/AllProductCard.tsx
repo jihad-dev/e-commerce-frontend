@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../Redux/hooks';
+import { useAppSelector } from '../../Redux/hooks';
 import { useAddToCartMutation, useGetCartQuery } from '../../Redux/features/cart/cartApi';
 import { toast } from 'sonner';
-import { log } from 'console';
+
 // removed: import styles from './ProductCard.module.css';
 
 // Define the structure of a Product based on the provided JSON
@@ -19,6 +19,7 @@ export interface Product {
     // type?: string; // Optional field from JSON
     brand?: string; // Optional field from JSON
     stock: number;
+    isFeatured: boolean;
     // quantity?: number; // Field from JSON, not typically needed on card
     // tags?: string[]; // Optional field from JSON
     ratings?: number; // Optional rating value
@@ -65,8 +66,10 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
         refetchOnReconnect: true,
 
     });
-   
-    const existingCartItem = cartItems?.items?.find((item: any) => item.productId?._id === product._id)
+
+
+    const items = (cartItems as { items?: any[] } | undefined)?.items ?? [];
+    const existingCartItem = items.find((item: any) => item.productId?._id === product._id);
     const cartQuantity = existingCartItem ? existingCartItem?.quantity : 0;
     const isOutOfStock = cartQuantity >= product?.stock;
 
@@ -75,6 +78,7 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
 
     const addToCart = async (productId: string) => {
+
         let toastId: string | number | undefined; // Declare toastId here
         try {
             toastId = toast.loading('Adding to cart...'); // Assign value inside try
@@ -113,17 +117,10 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
     };
 
 
-    // Simplified discount logic - assuming 'discount' field is percentage if present
-    // Or calculate based on price vs finalPrice if needed
+
     const discountPercent = product.discount; // Use discount field directly if it's percentage
-    // Alternative calculation if 'discount' field is not percentage:
-    // const calculateDiscountPercent = (original: number, final: number): number | null => {
-    //   if (original <= 0 || final <= 0 || final >= original) {
-    //       return null;
-    //   }
-    //   return Math.round(((original - final) / original) * 100);
-    // };
-    // const discountPercent = calculateDiscountPercent(product.price, product.finalPrice);
+    const isFeaturedProduct = product.isFeatured; // Use discount field directly if it's percentage
+
 
 
     const stockStatusText = getStockStatusText(product.stock);
@@ -132,18 +129,25 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const reviewCount = product.ratingsCount ?? 0; // Use ratingsCount, default to 0
 
     return (
-        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out group">
+        <Link to={`/product/${product._id}`} className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out group">
             <div className="relative w-full pt-[75%] bg-gray-100"> {/* Aspect ratio container */}
                 <img
                     src={product.images?.[0]} // Use images[0] directly
                     alt={product.title} // Use title
                     className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                {discountPercent && discountPercent > 0 && ( // Check if discount exists and is positive
+                {(discountPercent && discountPercent > 0) && (
                     <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
                         -{discountPercent}%
                     </span>
                 )}
+
+                {isFeaturedProduct && (
+                    <span className={`absolute top-2 ${discountPercent && discountPercent > 0 ? 'left-[72px]' : 'left-2'} bg-green-600 text-white text-xs font-bold px-2 py-1 rounded z-10`}>
+                        Featured
+                    </span>
+                )}
+
                 <button
                     className="absolute top-2 right-2 bg-white/80 border border-gray-200 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer text-gray-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition duration-200 z-10"
                     aria-label="Add to wishlist"
@@ -158,20 +162,20 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     <span className="ml-1">({reviewCount} ratings)</span> {/* Use reviewCount */}
                 </div>
                 <h3 className="text-base font-semibold mb-2 hover:underline text-gray-800 line-clamp-2 min-h-[2.8em] group-hover:text-blue-600 transition-colors">
-                    <Link to={`/product/${product._id}`}>
-                        <button className='text-blue-600 hover:text-blue-700 hover:underline cursor-pointer'> {product.title} </button>
-                    </Link>
+
+                    <button className='text-blue-600 hover:text-blue-700 hover:underline cursor-pointer'> {product.title} </button>
+
 
                 </h3>
 
                 <div className="mt-auto"> {/* Pushes price and stock down */}
                     <div className="flex items-baseline gap-2 mb-2">
                         <span className={`text-lg font-bold ${discountPercent && discountPercent > 0 ? 'text-red-600' : 'text-gray-900'}`}> {/* Check discount */}
-                            ${product.finalPrice.toFixed(2)} {/* Use finalPrice */}
+                            ৳{product.finalPrice.toFixed(2)} {/* Use finalPrice */}
                         </span>
                         {discountPercent && discountPercent > 0 && product.price > product.finalPrice && ( // Check discount and prices
                             <span className="text-sm text-gray-500 line-through">
-                                ${product.price.toFixed(2)} {/* Use price as original */}
+                                ৳{product.price.toFixed(2)} {/* Use price as original */}
                             </span>
                         )}
                     </div>
@@ -180,25 +184,34 @@ const AllProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             {stockStatusText}
                         </span>
                         <button
+
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200
                                ${isOutOfStock
                                     ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                                     : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'}`}
                             disabled={isOutOfStock}
-                            onClick={() => user ? addToCart(product._id.toString()) : navigate('/login')}
+                            onClick={(event) => {
+                                event.stopPropagation(); // link e jete dibe na
+                                event.preventDefault(); // link default behavior bondho
+
+                                if (isOutOfStock) return;
+
+                                if (user) {
+                                    addToCart(product._id.toString());
+                                } else {
+                                    navigate('/login');
+                                }
+                            }}
                         >
                             <CartIcon />
                             {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+
                         </button>
-
-
-
-
 
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 };
 

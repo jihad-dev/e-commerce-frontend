@@ -85,8 +85,8 @@ const ViewProductFullDetails = () => {
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{title || 'N/A'}</h2>
                             <div className="flex items-center space-x-4 mb-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-2xl font-bold text-green-600">${finalPrice?.toFixed(2) ?? 'N/A'}</span>
-                                    {discount && <span className="line-through text-gray-500">${price?.toFixed(2)}</span>}
+                                    <span className="text-2xl font-bold text-green-600">৳{finalPrice?.toFixed(2) ?? 'N/A'}</span>
+                                    {discount && <span className="line-through text-gray-500">৳{price?.toFixed(2)}</span>}
                                     {discount && <span className="bg-red-100 text-red-800 text-sm px-2 py-1 rounded">{discount}% OFF</span>}
                                 </div>
                             </div>
@@ -141,7 +141,7 @@ const ViewProductFullDetails = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-medium text-gray-700">Shipping</h4>
-                                        <p className="font-semibold">${shipping}</p>
+                                        <p className="font-semibold">৳ {shipping}</p>
                                     </div>
                                     <div>
                                         <h4 className="font-medium text-gray-700">Featured</h4>

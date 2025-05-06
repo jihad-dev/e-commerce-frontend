@@ -122,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
       ],
     },
     {
-      to: '/orders',
+      to: '/dashboard/orders',
       icon: <ShoppingCart size={20} />,
       label: 'Orders',
     },
